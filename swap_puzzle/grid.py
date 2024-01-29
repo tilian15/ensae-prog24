@@ -79,7 +79,7 @@ class Grid():
             self.state[cell1[0]][cell1[1]], self.state[cell2[0]][cell2[1]] = self.state[cell2[0]][cell2[1]], self.state[cell1[0]][cell1[1]]
         else:
             print("error unavailable swap")
-
+    
 
     def swap_seq(self, cell_pair_list):
         """
@@ -141,9 +141,30 @@ class Grid():
             self.swap(coordonne_a, (coordonne_a[0] + 1, coordonne_a[1]))
             l.append(((coordonne_a[0],coordonne_a[1]),(coordonne_a[0] + 1, coordonne_a[1])))
             coordonne_a = self.coordonne(a)
-            
-
         return l
+    
+
+    def haschage(self):
+        a=''
+        for i in self.state : 
+            for j in i : 
+                a+=str(j)
+        return(int(a))
+     
+    def etat_possible(self):
+        l=[]
+        grid=self.state
+        for j in range(len(self.state)):
+            for i in range(len(self.state)[0]-1):
+                grid=self.state
+                l.append((((j,i+1),(j,i)),self.swap(self.state,((j,i+1),(j,i)))))
+        for l in range(len(self.state[0])):
+            for k in range(len(self.state)-1):
+                l.append((((k+1,l),(k,l)),self.swap(self.state,((k+1,l),(k,l)))))
+        
+
+
+
     
     # def bonne_ligne(self,a):  #permet de mettre un nombre sur sa bonne ligne 
     #     coordonne_a=self.coordonne(a)

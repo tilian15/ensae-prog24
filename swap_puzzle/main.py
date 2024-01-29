@@ -1,11 +1,16 @@
 from grid import Grid
 from solver import Solver
-# g = Grid(2, 3)
-# print(g)
+g = Grid(2, 3)
+print(g)
+print(g.haschage())
+
 # print("caca")
 # # # print (g.is_sorted())
-# # g.swap((0,0),(1,0))
-# # print(g)
+
+print(g)
+print("a")
+print(a)
+# print(g.haschage())
 # g.swap_seq([((0,0),(1,0)),((1,2),(1,1))])
 # # print(g)
 # # print("les coord sont")
@@ -27,13 +32,13 @@ from solver import Solver
 
 # print(g)
 
-from graph import Graph
-G=Graph([1,2])
-print(G)
-G2= Graph.graph_from_file("../input/graph1.in")
-print(G2)
-print("caca")
-print(G2.bfs(1,6))
+# from graph import Graph
+# G=Graph([1,2])
+# print(G)
+# G2= Graph.graph_from_file("../input/graph1.in")
+# print(G2)
+# print("caca")
+# print(G2.bfs(1,6))
 
 
 
