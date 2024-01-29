@@ -59,11 +59,11 @@ class Grid():
         Checks is the current state of the grid is sorte and returns the answer as a boolean.
         """
         test = np.arange(1,(self.n * self.m )+1)
-        print(test)
+        #print(test)
         test2 = []
         for i in self.state:
             test2+=i
-        print(test2)
+        #print(test2)
         return not(False in (test2 == test))
 
     def swap(self, cell1, cell2):
@@ -93,6 +93,76 @@ class Grid():
         """ 
         for i in cell_pair_list:
             self.swap(i[0],i[1])
+
+
+    
+    def coordonne(self,a):
+        for i in range(len(self.state)):
+            for j in range(len(self.state[0])):
+                if self.state[i][j]==a : 
+                    return (i,j)
+                
+
+    def bonne_colonne(self,a): #permet de mettre un nombre sur sa bonne colonne 
+        coordonne_a=self.coordonne(a)
+        if a %self.n==0 : 
+            bonne_colonne = self.n -1
+        else : 
+            bonne_colonne= a%self.n -1
+        l=[]
+        while coordonne_a[1]>bonne_colonne:
+            self.swap(coordonne_a,((coordonne_a[0],coordonne_a[1]-1)))
+            l.append(((coordonne_a[0],coordonne_a[1]),(coordonne_a[0],coordonne_a[1]-1)))
+            coordonne_a=self.coordonne(a)
+        while coordonne_a[1]<bonne_colonne:
+            self.swap(coordonne_a,((coordonne_a[0],coordonne_a[1]+1)))
+            l.append(((coordonne_a[0],coordonne_a[1]),(coordonne_a[0],coordonne_a[1]+1)))
+            coordonne_a=self.coordonne(a)
+        return l 
+
+
+    def bonne_ligne(self, a):
+    # permet de mettre un nombre sur sa bonne ligne
+        coordonne_a = self.coordonne(a)
+        if a%self.n == 0 :
+            bonne_ligne = a//(self.n+1) 
+        else :
+            bonne_ligne = a //self.n 
+        l = []
+        print(coordonne_a)
+        print(bonne_ligne)
+    
+        while coordonne_a[0] > bonne_ligne:
+            self.swap(coordonne_a, (coordonne_a[0] - 1, coordonne_a[1]))
+            l.append(((coordonne_a[0] - 1, coordonne_a[1]),(coordonne_a[0],coordonne_a[1])))
+            coordonne_a = self.coordonne(a)
+           
+        while coordonne_a[0] < bonne_ligne:
+            self.swap(coordonne_a, (coordonne_a[0] + 1, coordonne_a[1]))
+            l.append(((coordonne_a[0],coordonne_a[1]),(coordonne_a[0] + 1, coordonne_a[1])))
+            coordonne_a = self.coordonne(a)
+            
+
+        return l
+    
+    # def bonne_ligne(self,a):  #permet de mettre un nombre sur sa bonne ligne 
+    #     coordonne_a=self.coordonne(a)
+    #     bonne_ligne= a%self.m -1
+    #     l=[]
+    #     while coordonne_a[0]>bonne_ligne:
+    #         self.swap(coordonne_a,((coordonne_a[0]-1,coordonne_a[1])))
+    #         coordonne_a=self.coordonne(a)
+    #         l.append((coordonne_a[0]-1,coordonne_a[1]))
+    #     while coordonne_a[0]<bonne_ligne:
+    #         self.swap(coordonne_a,((coordonne_a[0]+1,coordonne_a[1])))
+    #         l.append((coordonne_a[0]+1,coordonne_a[1]))
+    #         coordonne_a=self.coordonne(a)
+    #     return l 
+
+
+            
+
+        
 
     @classmethod
     def grid_from_file(cls, file_name): 
