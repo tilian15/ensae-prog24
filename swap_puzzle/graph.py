@@ -96,9 +96,39 @@ class Graph:
         -------
         path: list[NodeType] | None
             The shortest path from src to dst. Returns None if dst is not reachable from src
-        """ 
-        # TODO: implement this function (and remove the line "raise NotImplementedError").
-        raise NotImplementedError
+        """
+        dist=[-1 for i in range(len(self.nodes))] 
+        deja_traiter=[False for i in range(len(self.nodes))]
+        pred = [src for i in range(len(self.nodes))]
+        a_traiter=[]  
+        deja_traiter[src-1]=True
+        a_traiter.append(src)
+        dist[src-1]=0
+        while len(a_traiter)>0 :
+            y= a_traiter.pop()
+            for t in self.graph[y]:
+                if not(deja_traiter[t-1]):
+                    deja_traiter[t-1]=True
+                    a_traiter.append(t)
+                    dist[t-1]=dist[y-1]+1
+                    pred[t-1]=y
+        a=dst
+        plus_court_chemin=[dst]
+        print(plus_court_chemin)
+        print("toto")
+        while pred[a-1]!=src:
+            a=pred[a-1]
+            plus_court_chemin.append(a)
+        plus_court_chemin.append(src)
+        plus_court_chemin.reverse()
+        return plus_court_chemin
+
+
+            
+
+
+
+
 
     @classmethod
     def graph_from_file(cls, file_name):

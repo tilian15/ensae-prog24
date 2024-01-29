@@ -32,6 +32,7 @@ class Solver():
             print(self.grid)
         return sequence
         
+    # complexité (n+m)*n*m
 
 
 
