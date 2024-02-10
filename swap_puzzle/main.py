@@ -2,14 +2,15 @@ from grid import Grid
 from solver import Solver
 g = Grid(2, 3)
 print(g)
-print(g.haschage())
+print(g.state)
+# print(g.haschage())
 
 # print("caca")
 # # # print (g.is_sorted())
 
-print(g)
-print("a")
-print(a)
+#print(g.etat_possible())
+print(g.grid_to_graph())
+# print("a")
 # print(g.haschage())
 # g.swap_seq([((0,0),(1,0)),((1,2),(1,1))])
 # # print(g)

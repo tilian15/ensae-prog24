@@ -71,13 +71,13 @@ class Graph:
             self.graph[node1] = []
             self.nb_nodes += 1
             self.nodes.append(node1)
-        if node2 not in self.graph:
-            self.graph[node2] = []
-            self.nb_nodes += 1
-            self.nodes.append(node2)
+        # if node2 not in self.graph:
+        #     self.graph[node2] = []
+        #     self.nb_nodes += 1
+        #     self.nodes.append(node2)
 
         self.graph[node1].append(node2)
-        self.graph[node2].append(node1)
+        # self.graph[node2].append(node1)
         self.nb_edges += 1
         self.edges.append((node1, node2))
 
@@ -123,7 +123,7 @@ class Graph:
         plus_court_chemin.reverse()
         return plus_court_chemin
     
-    
+
 
 
             

@@ -1,9 +1,31 @@
 """
 This is the grid module. It contains the Grid class and its associated methods.
 """
-
+from graph import Graph 
 import random
 import numpy as np 
+
+def global_haschage(values):
+        a=''
+        for i in values : 
+            for j in i : 
+                a+=str(j)
+        return(int(a))
+
+# From a hash, create a Grid
+def get_grid_from_hash(m,n,hash):
+    i = 0
+    tab = []
+    line  = []
+    for a in str(hash):
+        line.append(int(a))
+        i = i + 1
+        if (i == n) :
+            tab.append(line)
+            i = 0
+            line = []
+    return Grid(m, n, tab)
+
 
 class Grid():
     """
@@ -54,7 +76,7 @@ class Grid():
         """
         return f"<grid.Grid: m={self.m}, n={self.n}>"
 
-    def is_sorted(self):
+    def is_sorted(self): #permet de verifier si la grille est bien triée
         """
         Checks is the current state of the grid is sorte and returns the answer as a boolean.
         """
@@ -75,11 +97,12 @@ class Grid():
         cell1, cell2: tuple[int]
             The two cells to swap. They must be in the format (i, j) where i is the line and j the column number of the cell. 
         """
-        if (cell1[0] == cell2[0] and abs(cell1[1]-cell2[1]) == 1) or (cell1[1] == cell2[1] and abs(cell1[0]-cell2[0]) == 1): 
+        if (cell1[0] == cell2[0] and abs(cell1[1]-cell2[1]) == 1) or (cell1[1] == cell2[1] and abs(cell1[0]-cell2[0]) == 1): #verifie si la distance est bien égale à 1 et que les 2 cases sont cote à cote
             self.state[cell1[0]][cell1[1]], self.state[cell2[0]][cell2[1]] = self.state[cell2[0]][cell2[1]], self.state[cell1[0]][cell1[1]]
         else:
             print("error unavailable swap")
-    
+            print(cell1,cell2)
+
 
     def swap_seq(self, cell_pair_list):
         """
@@ -96,7 +119,7 @@ class Grid():
 
 
     
-    def coordonne(self,a):
+    def coordonne(self,a): #permet de renvoyer les coordonnées d'un chiffre dans la grille 
         for i in range(len(self.state)):
             for j in range(len(self.state[0])):
                 if self.state[i][j]==a : 
@@ -144,44 +167,131 @@ class Grid():
         return l
     
 
-    def haschage(self):
-        a=''
-        for i in self.state : 
-            for j in i : 
-                a+=str(j)
-        return(int(a))
+    # def haschage(self): #permet à chaque grille de renvoyer une serie de chiffre afin de l'identifier comme un int et pouvoir la faire correspondre à un noeud
+    #     a=''
+    #     for i in self.state : 
+    #         for j in i : 
+    #             a+=str(j)
+    #     return(int(a))
+
+    # def haschage(self): #permet à chaque grille de renvoyer une serie de chiffre afin de l'identifier comme un int et pouvoir la faire correspondre à un noeud
+    #     return globalHaschage(self.state)
      
     def etat_possible(self):
         l=[]
-        grid=self.state
         for j in range(len(self.state)):
-            for i in range(len(self.state)[0]-1):
-                grid=self.state
-                l.append((((j,i+1),(j,i)),self.swap(self.state,((j,i+1),(j,i)))))
-        for l in range(len(self.state[0])):
+            for i in range(len(self.state[0])-1):
+                self.swap((j,i+1),(j,i))
+                
+                a = [row[:] for row in self.state]
+                #print(a)
+                l.append((((j,i+1),(j,i)),a))  #probleme (résolu), le a qui est ajouté a la liste n'est pas le meme que celui afficher au dessus, pb resolu grace a une copie de self.state
+                self.swap((j,i+1),(j,i))
+        for y in range(len(self.state[0])):
             for k in range(len(self.state)-1):
-                l.append((((k+1,l),(k,l)),self.swap(self.state,((k+1,l),(k,l)))))
-        
-
-
-
+                self.swap((k+1,y),(k,y))
+                a = [row[:] for row in self.state]
+                l.append((((k+1,y),(k,y)),a))
+                self.swap((k+1,y),(k,y))
+        return l 
     
-    # def bonne_ligne(self,a):  #permet de mettre un nombre sur sa bonne ligne 
-    #     coordonne_a=self.coordonne(a)
-    #     bonne_ligne= a%self.m -1
-    #     l=[]
-    #     while coordonne_a[0]>bonne_ligne:
-    #         self.swap(coordonne_a,((coordonne_a[0]-1,coordonne_a[1])))
-    #         coordonne_a=self.coordonne(a)
-    #         l.append((coordonne_a[0]-1,coordonne_a[1]))
-    #     while coordonne_a[0]<bonne_ligne:
-    #         self.swap(coordonne_a,((coordonne_a[0]+1,coordonne_a[1])))
-    #         l.append((coordonne_a[0]+1,coordonne_a[1]))
-    #         coordonne_a=self.coordonne(a)
-    #     return l 
-
-
+    def etat_possible_to_haschage(self):
+        etat_poss=self.etat_possible()
+        #print(etat_poss)
+        a = [row[:] for row in etat_poss]
+        for i in range(len(etat_poss)):
             
+            a[i]=(etat_poss[i][0],global_haschage(etat_poss[i][1]))
+            
+        return a
+
+    # def grid_to_graph(self):
+    #     graph = {}
+
+    #     def add_edge(node1, node2):
+    #         if node1 not in graph:
+    #             graph[node1] = []
+    #         graph[node1].append(node2)
+
+    #     def explore_state(current_state):
+    #         print ('explorer state ')
+    #         print (current_state)
+    #         # current_hash = self.haschage()
+    #         current_hash = current_state
+    #         self.visited.append(current_hash)
+
+    #         possible_states = self.etat_possible_to_haschage() #le pb est que self.etat_possible_to_haschage se réalise sur la toute premirere grille alors que je veux qu'elle se fasse sur la nouvelle grille issus de current_state
+
+    #         for move, next_state_hash in possible_states:
+    #             add_edge(current_hash, next_state_hash)
+
+    #             if next_state_hash not in self.visited:
+    #                 explore_state(next_state_hash)
+
+    #     self.visited = []
+    #     explore_state(self.haschage())
+
+    #     # def explore_state(self):
+    #     #     current_state=globalHaschage(self)
+    #     #     print ('explorer state ')
+    #     #     print (current_state)
+    #     #     # current_hash = self.haschage()
+    #     #     current_hash = current_state
+    #     #     self.visited.append(current_hash)
+
+    #     #     possible_states = self.etat_possible_to_haschage()
+
+    #     #     for move, next_state_hash in possible_states:
+    #     #         add_edge(current_hash, next_state_hash)
+
+    #     #         if next_state_hash not in self.visited:
+    #     #             explore_state(next_state_hash)
+
+    #     # self.visited = []
+    #     # explore_state(self)
+
+    # #afficher comme l'affichage de graph1.in
+    #     for node, neighbors in graph.items():
+    #         for neighbor in neighbors:
+    #             print(f"{node} {neighbor}")
+
+    def grid_to_graph(self):
+        graph = Graph()
+
+        # def add_edge(node1, node2):
+        #     if node1 not in graph:
+        #         graph[node1] = []
+        #     graph[node1].append(node2)
+
+        def explore_state(gridHash):
+            print ('explorer state ')
+            print (gridHash)
+            gridToManipulate = get_grid_from_hash(self.m, self.n, gridHash)
+            # current_hash = self.haschage()
+            current_hash = gridHash
+            self.visited.append(gridHash)
+
+            possible_states =  gridToManipulate.etat_possible_to_haschage()
+
+            for move, next_state_hash in possible_states:
+                print ("->" + str(next_state_hash))
+                graph.add_edge(current_hash, next_state_hash)
+
+                if next_state_hash not in self.visited:
+                    explore_state(next_state_hash)
+
+        self.visited = []
+        explore_state(self.hashage())
+
+    #afficher comme l'affichage de graph1.in
+        # for node, neighbors in graph.items():
+        #     for neighbor in neighbors:
+        #         print(f"{node} {neighbor}")
+
+        return graph
+
+
+          
 
         
 
@@ -214,3 +324,6 @@ class Grid():
         return grid
 
 
+    def hashage(self):
+        return global_haschage(self.state)
+    
