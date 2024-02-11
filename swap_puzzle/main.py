@@ -12,15 +12,15 @@ print(g.state)
 
 # print("a")
 # print(g.haschage())
-# g.swap_seq([((0,0),(1,0)),((1,2),(1,1))])
+#g.swap_seq([((0,0),(1,0)),((1,2),(1,1))])
 # # print(g)
 # # print("les coord sont")
 # # print(g.coordonne(2))
 # print(g)
-# g=Solver(g)
+#g=Solver(g)
 # print("reee ")
 # # g.bonne_colonne(3)
-# print(g.get_solution_naive())
+#print(g.get_solution_naive())
 # print("pipi")
 # print(g)
 # print(g)
@@ -41,7 +41,9 @@ from graph import Graph
 # print(G)
 G2= Graph.graph_from_file("../input/graph1.in")
 
-g.swap_seq([((0,0),(1,0)),((1,2),(1,1))])
+g.swap_seq([((0,0),(1,0)),((1,2),(1,1)),((1,1),(1,0))])
+
+#g.swap_seq([((0,0),(1,0))])
 
 print(g)
 
@@ -49,9 +51,10 @@ A=g.grid_to_graph()
 print(A)
 print(A.bfs(g.hashage(),123456))
 
-
+# print(g)
 # print(G2)
 # print("caca")
+# print(G2.bfs2(1,6))
 # print(G2.bfs(1,6))
 
 

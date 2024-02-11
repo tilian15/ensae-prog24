@@ -5,7 +5,7 @@ from graph import Graph
 import random
 import numpy as np 
 
-def global_haschage(values):
+def global_haschage(values): #on sait que cette fonction de haschage ne marchera pas pour certaines grilles mais on tentera d'en implémenter une nouvelle pour le prochain rendu   
         a=''
         for i in values : 
             for j in i : 
@@ -283,14 +283,12 @@ class Grid():
         self.visited = []
         explore_state(self.hashage())
 
-    #afficher comme l'affichage de graph1.in
-        # for node, neighbors in graph.items():
-        #     for neighbor in neighbors:
-        #         print(f"{node} {neighbor}")
 
         return graph
 
-
+    def hashage(self):
+        return global_haschage(self.state)
+    
           
 
         
@@ -324,6 +322,4 @@ class Grid():
         return grid
 
 
-    def hashage(self):
-        return global_haschage(self.state)
     

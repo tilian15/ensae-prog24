@@ -75,10 +75,10 @@ class Graph:
             self.graph[node2] = []
             self.nb_nodes += 1
             self.nodes.append(node2)
-        if node2 not in self.graph[node1]:
+        if node2 not in self.graph[node1]: #rajout de cette ligne pour éviter les doublons 
 
             self.graph[node1].append(node2)
-        if node1 not in self.graph[node2]:
+        if node1 not in self.graph[node2]: #idem
             self.graph[node2].append(node1)
         self.nb_edges += 1
         self.edges.append((node1, node2))
@@ -99,7 +99,7 @@ class Graph:
         path: list[NodeType] | None
             The shortest path from src to dst. Returns None if dst is not reachable from src
         """
-        dist=[-1 for i in range(max(self.nodes))]  
+        dist=[-1 for i in range(max(self.nodes))]  #ce n'est pas la meilleure implémentation car on crée un tableau énorme donc on cherche à faire autrement plus tard(cf bfs2)
         deja_traiter=[False for i in range(max(self.nodes))]
         pred = [src for i in range(max(self.nodes))]
         a_traiter=[]  
@@ -107,7 +107,7 @@ class Graph:
         a_traiter.append(src)
         dist[src-1]=0
         while len(a_traiter)>0 :
-            y= a_traiter.pop()
+            y= a_traiter.pop(0)
             for t in self.graph[y]:
                 if not(deja_traiter[t-1]):
                     deja_traiter[t-1]=True
@@ -120,7 +120,7 @@ class Graph:
         print("toto")
         print(pred[a-1], src, dst)
        # print(pred[645312-1])
-        if pred[a-1]!= src : 
+        if pred[a-1]!= src : #on effectue le chemin inverse pour trouver le chemin
             while pred[a-1]!=src:
                 a=pred[a-1]
                 plus_court_chemin.append(a)
@@ -128,7 +128,7 @@ class Graph:
             plus_court_chemin.reverse()
             return plus_court_chemin
         else : 
-            return [src, dst] if src == dst else None #dst n'est pas atteignable
+            return [src, dst] #if src == dst else None #dst n'est pas atteignable
         # print(plus_court_chemin)
         # print("toto")
         # if pred[a]!=src : 
@@ -141,7 +141,71 @@ class Graph:
         # else : 
         #     return [src, dst] if src == dst else None #dst n'est pas atteignable  
 
+    def bfs2(self, src, dst): #on cherche à implémenter cette fonction pour trouver une alternative et éviter de créer un tableau de taille len(max) mais pour le moment le plus court chemin n'est pas optimal 
+            """
+            Finds a shortest path from src to dst by BFS.  
 
+            Parameters: 
+            -----------
+            src: NodeType
+                The source node.
+            dst: NodeType
+                The destination node.
+
+            Output: 
+            -------
+            path: list[NodeType] | None
+                The shortest path from src to dst. Returns None if dst is not reachable from src
+            """
+            print ("From "  + str(src) + ' to ' + str(dst))
+
+
+            #  contains the nodes processed
+            nodes_done = []
+            # contains the list on which we must to the processing
+            nodes_todo = [src]
+            # hash of the predecessor
+            predecessors = {}
+            # 0 : root level
+            predecessors = {src: 0}
+
+            # if we found the dst
+            found = False
+            
+            # Create the predecessors list using BFG algo : https://fr.wikipedia.org/wiki/Algorithme_de_parcours_en_largeur
+            while len(nodes_todo)>0 and not found :
+
+                # Important -> take the first of the array
+                node_to_analyse = nodes_todo.pop(0) 
+
+
+                for n in self.graph[node_to_analyse]:
+                    if n not in nodes_done:
+                        if (n not in nodes_todo) :
+                            nodes_todo.append(n)
+                        predecessors[n] = node_to_analyse
+
+                        # Optimization to exit the while
+                        if (n == dst):
+                            found = True
+
+                nodes_done.append(node_to_analyse)
+                        
+            print ('Predecessors-----------')
+            print(predecessors)
+
+            
+            # Generate the list 
+            result = []            
+            previous = dst
+            while (predecessors[previous] != 0):
+                result.append(previous)
+                previous = predecessors[previous]
+            result.append(previous)
+
+            # In src to dst order
+            result.reverse()
+            return result
 
             
 
