@@ -47,10 +47,13 @@ print(g)
 
 A=g.grid_to_graph()
 print(A)
-#print(G2)
-# print("caca")
-#print(G2.bfs(1,6))
 print(A.bfs(g.hashage(),123456))
+
+
+# print(G2)
+# print("caca")
+# print(G2.bfs(1,6))
+
 
 
 

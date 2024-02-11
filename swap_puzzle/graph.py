@@ -71,13 +71,15 @@ class Graph:
             self.graph[node1] = []
             self.nb_nodes += 1
             self.nodes.append(node1)
-        # if node2 not in self.graph:
-        #     self.graph[node2] = []
-        #     self.nb_nodes += 1
-        #     self.nodes.append(node2)
+        if node2 not in self.graph: #j'ai decommenter ??? 
+            self.graph[node2] = []
+            self.nb_nodes += 1
+            self.nodes.append(node2)
+        if node2 not in self.graph[node1]:
 
-        self.graph[node1].append(node2)
-        # self.graph[node2].append(node1)
+            self.graph[node1].append(node2)
+        if node1 not in self.graph[node2]:
+            self.graph[node2].append(node1)
         self.nb_edges += 1
         self.edges.append((node1, node2))
 
@@ -117,7 +119,7 @@ class Graph:
         print(plus_court_chemin)
         print("toto")
         print(pred[a-1], src, dst)
-        print(pred[645312-1])
+       # print(pred[645312-1])
         if pred[a-1]!= src : 
             while pred[a-1]!=src:
                 a=pred[a-1]
