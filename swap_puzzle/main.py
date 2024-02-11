@@ -9,7 +9,7 @@ print(g.state)
 # # # print (g.is_sorted())
 
 #print(g.etat_possible())
-print(g.grid_to_graph())
+
 # print("a")
 # print(g.haschage())
 # g.swap_seq([((0,0),(1,0)),((1,2),(1,1))])
@@ -31,16 +31,26 @@ print(g.grid_to_graph())
 # g.bonne_ligne(6)
 # print("bonne ligne")
 
-# print(g)
+print(g)
 
-# from graph import Graph
+
+
+# print(g.grid_to_graph())
+from graph import Graph
 # G=Graph([1,2])
 # print(G)
-# G2= Graph.graph_from_file("../input/graph1.in")
-# print(G2)
-# print("caca")
-# print(G2.bfs(1,6))
+G2= Graph.graph_from_file("../input/graph1.in")
 
+g.swap_seq([((0,0),(1,0)),((1,2),(1,1))])
+
+print(g)
+
+A=g.grid_to_graph()
+print(A)
+#print(G2)
+# print("caca")
+#print(G2.bfs(1,6))
+print(A.bfs(g.hashage(),123456))
 
 
 

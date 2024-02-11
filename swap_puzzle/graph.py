@@ -97,9 +97,9 @@ class Graph:
         path: list[NodeType] | None
             The shortest path from src to dst. Returns None if dst is not reachable from src
         """
-        dist=[-1 for i in range(len(self.nodes))] 
-        deja_traiter=[False for i in range(len(self.nodes))]
-        pred = [src for i in range(len(self.nodes))]
+        dist=[-1 for i in range(max(self.nodes))]  
+        deja_traiter=[False for i in range(max(self.nodes))]
+        pred = [src for i in range(max(self.nodes))]
         a_traiter=[]  
         deja_traiter[src-1]=True
         a_traiter.append(src)
@@ -116,13 +116,28 @@ class Graph:
         plus_court_chemin=[dst]
         print(plus_court_chemin)
         print("toto")
-        while pred[a-1]!=src:
-            a=pred[a-1]
-            plus_court_chemin.append(a)
-        plus_court_chemin.append(src)
-        plus_court_chemin.reverse()
-        return plus_court_chemin
-    
+        print(pred[a-1], src, dst)
+        print(pred[645312-1])
+        if pred[a-1]!= src : 
+            while pred[a-1]!=src:
+                a=pred[a-1]
+                plus_court_chemin.append(a)
+            plus_court_chemin.append(src)
+            plus_court_chemin.reverse()
+            return plus_court_chemin
+        else : 
+            return [src, dst] if src == dst else None #dst n'est pas atteignable
+        # print(plus_court_chemin)
+        # print("toto")
+        # if pred[a]!=src : 
+        #     while pred[a]!=src:
+        #         a=pred[a]
+        #         plus_court_chemin.append(a)
+        #     plus_court_chemin.append(src)
+        #     plus_court_chemin.reverse()
+        #     return plus_court_chemin
+        # else : 
+        #     return [src, dst] if src == dst else None #dst n'est pas atteignable  
 
 
 
