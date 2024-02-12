@@ -106,7 +106,8 @@ class Graph:
         deja_traiter[src-1]=True
         a_traiter.append(src)
         dist[src-1]=0
-        while len(a_traiter)>0 :
+        found = False
+        while len(a_traiter)>0 and not found:
             y= a_traiter.pop(0)
             for t in self.graph[y]:
                 if not(deja_traiter[t-1]):
@@ -114,6 +115,8 @@ class Graph:
                     a_traiter.append(t)
                     dist[t-1]=dist[y-1]+1
                     pred[t-1]=y
+                if t == dst:
+                    found = True 
         a=dst
         plus_court_chemin=[dst]
         print(plus_court_chemin)
