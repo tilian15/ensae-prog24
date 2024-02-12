@@ -18,6 +18,11 @@ def get_grid_from_hash2(m,n,values):
     for i in dic2:
         if dic2[i]==values:
             return Grid(m,n,eval(i))
+        
+def get_grid_from_hashfinal(values):
+    for i in dic2:
+        if dic2[i]==values:
+            return eval(i)
             
     
 

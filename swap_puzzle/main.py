@@ -1,5 +1,6 @@
 from grid import Grid
 from grid import global_haschage2
+from grid import get_grid_from_hashfinal
 from solver import Solver
 g = Grid(2, 3)
 print(g)
@@ -51,6 +52,19 @@ print(g)
 A=g.grid_to_graph2()
 #print(A)
 print(A.bfs2(g.hashage2(),global_haschage2([[1,2,3],[4,5,6]])))
+
+
+#les lignes suivantes permettent d'afficher correctement le chemin de résolution
+#------------
+B=[a for a in A.bfs2(g.hashage2(),global_haschage2([[1,2,3],[4,5,6]]))]
+print("BBBBB")
+print(B)
+for i in range(len(B)):
+    B[i]= get_grid_from_hashfinal(B[i])
+print(B)
+#------------
+
+
 #print(A.bfs2(g.hashage(),123456))
 # print(g)
 # print(G2)
