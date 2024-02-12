@@ -70,6 +70,33 @@ class Test_Swap(unittest.TestCase):
          result = graph.bfs2(grid.hashage(),1234)
          print ('BFS:')
          print (result)
+    def test_checkGraph1In(self):
+        graph = Graph.graph_from_file("./input/graph1.in")
+        # print(graph)
+        # print("*********")
+        # print(graph.bfs2(1,2))
+        # print("*********")
+        # print(graph.bfs2(1,4))
 
+        # Check 
+        solution_file =  open("./input/graph1.path.out", 'r')
+
+        for l in solution_file.readlines():
+            a = l.split(' ')
+            
+            src = int(a[0])
+            dst = int(a[1])
+            result_expected = l[l.index('['):-1]
+            
+            result = graph.bfs2(src,dst)
+            result_string = '[' + ', '.join(str (a) for a in result) + ']'
+            
+            
+            self.assertEqual(result_string, result_expected)
+            # if (result_string != result_expected) :
+            #     print ('************')
+            #     print(l)
+            
+        solution_file.close()
 if __name__ == '__main__':
     unittest.main()

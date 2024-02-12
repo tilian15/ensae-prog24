@@ -119,6 +119,7 @@ class Graph:
         print(plus_court_chemin)
         print("toto")
         print(pred[a-1], src, dst)
+        
        # print(pred[645312-1])
         if pred[a-1]!= src : #on effectue le chemin inverse pour trouver le chemin
             while pred[a-1]!=src:
@@ -141,6 +142,8 @@ class Graph:
         # else : 
         #     return [src, dst] if src == dst else None #dst n'est pas atteignable  
 
+
+
     def bfs2(self, src, dst): #on cherche à implémenter cette fonction pour trouver une alternative et éviter de créer un tableau de taille len(max) mais pour le moment le plus court chemin n'est pas optimal 
             """
             Finds a shortest path from src to dst by BFS.  
@@ -160,22 +163,22 @@ class Graph:
             print ("From "  + str(src) + ' to ' + str(dst))
 
 
-            #  contains the nodes processed
+           
             nodes_done = []
-            # contains the list on which we must to the processing
+            
             nodes_todo = [src]
-            # hash of the predecessor
+           
             predecessors = {}
-            # 0 : root level
+            
             predecessors = {src: 0}
 
-            # if we found the dst
+           #if we found the dst
             found = False
             
-            # Create the predecessors list using BFG algo : https://fr.wikipedia.org/wiki/Algorithme_de_parcours_en_largeur
+            
             while len(nodes_todo)>0 and not found :
 
-                # Important -> take the first of the array
+                
                 node_to_analyse = nodes_todo.pop(0) 
 
 
@@ -185,7 +188,7 @@ class Graph:
                             nodes_todo.append(n)
                         predecessors[n] = node_to_analyse
 
-                        # Optimization to exit the while
+                        #to exit the while
                         if (n == dst):
                             found = True
 
@@ -195,7 +198,7 @@ class Graph:
             print(predecessors)
 
             
-            # Generate the list 
+            
             result = []            
             previous = dst
             while (predecessors[previous] != 0):
@@ -203,7 +206,7 @@ class Graph:
                 previous = predecessors[previous]
             result.append(previous)
 
-            # In src to dst order
+            
             result.reverse()
             return result
 
