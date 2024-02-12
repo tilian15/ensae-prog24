@@ -148,70 +148,46 @@ class Graph:
 
 
     def bfs2(self, src, dst): #on cherche à implémenter cette fonction pour trouver une alternative et éviter de créer un tableau de taille len(max) mais pour le moment le plus court chemin n'est pas optimal 
-            """
-            Finds a shortest path from src to dst by BFS.  
-
-            Parameters: 
-            -----------
-            src: NodeType
-                The source node.
-            dst: NodeType
-                The destination node.
-
-            Output: 
-            -------
-            path: list[NodeType] | None
-                The shortest path from src to dst. Returns None if dst is not reachable from src
-            """
-            print ("From "  + str(src) + ' to ' + str(dst))
-
-
-           
-            nodes_done = []
             
-            nodes_todo = [src]
-           
-            predecessors = {}
-            
-            predecessors = {src: 0}
-
-           #if we found the dst
-            found = False
-            
-            
-            while len(nodes_todo)>0 and not found :
+        print("From "  + str(src) + ' to ' + str(dst))
+        nodes_done = []
+        nodes_todo = [src]
+        predecessors = {}
+        predecessors = {src: 0}
+        #if we found the dst
+        found = False           
+        while len(nodes_todo)>0 and not found :
 
                 
-                node_to_analyse = nodes_todo.pop(0) 
-
-
-                for n in self.graph[node_to_analyse]:
-                    if n not in nodes_done:
-                        if (n not in nodes_todo) :
-                            nodes_todo.append(n)
+            node_to_analyse = nodes_todo.pop(0) 
+            for n in self.graph[node_to_analyse]:
+                if n not in nodes_done:
+                    if (n not in nodes_todo) :
+                        nodes_todo.append(n)
                         predecessors[n] = node_to_analyse
+                    #to exit the while
+                    if (n == dst):
+                        found = True
 
-                        #to exit the while
-                        if (n == dst):
-                            found = True
-
-                nodes_done.append(node_to_analyse)
-                        
-            print ('Predecessors-----------')
-            print(predecessors)
+            nodes_done.append(node_to_analyse)
+        if not found:
+            return None 
+                   
+        print ('Predecessors-----------')
+        print(predecessors)
 
             
             
-            result = []            
-            previous = dst
-            while (predecessors[previous] != 0):
-                result.append(previous)
-                previous = predecessors[previous]
+        result = []            
+        previous = dst
+        while (predecessors[previous] != 0):
             result.append(previous)
+            previous = predecessors[previous]
+        result.append(previous)
 
             
-            result.reverse()
-            return result
+        result.reverse()
+        return result
 
             
 
