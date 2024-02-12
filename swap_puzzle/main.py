@@ -1,9 +1,10 @@
 from grid import Grid
+from grid import global_haschage2
 from solver import Solver
 g = Grid(2, 3)
 print(g)
 print(g.state)
-# print(g.haschage())
+print(g.hashage2())
 
 # print("caca")
 # # # print (g.is_sorted())
@@ -47,14 +48,14 @@ g.swap_seq([((0,0),(1,0)),((1,2),(1,1)),((1,1),(1,0))])
 
 print(g)
 
-A=g.grid_to_graph()
-print(A)
-#print(A.bfs(g.hashage(),123456))
+A=g.grid_to_graph2()
+#print(A)
+print(A.bfs2(g.hashage2(),global_haschage2([[1,2,3],[4,5,6]])))
 #print(A.bfs2(g.hashage(),123456))
 # print(g)
 # print(G2)
 # print("caca")
-print(G2.bfs2(1,6))
+#print(G2.bfs2(1,6))
 # print(G2.bfs(1,6))
 
 

@@ -5,12 +5,28 @@ from graph import Graph
 import random
 import numpy as np 
 
+dic2={}
+cpt=0
+def global_haschage2(values):
+    global cpt 
+    if str(values) not in dic2:
+        dic2[str(values)]=cpt
+        cpt=cpt+1
+    return dic2[str(values)]
+
+def get_grid_from_hash2(m,n,values):
+    for i in dic2:
+        if dic2[i]==values:
+            return Grid(m,n,eval(i))
+            
+    
+
 def global_haschage(values): #on sait que cette fonction de haschage ne marchera pas pour certaines grilles mais on tentera d'en implémenter une nouvelle pour le prochain rendu   
-        a=''
-        for i in values : 
-            for j in i : 
-                a+=str(j)
-        return(int(a))
+    a=''
+    for i in values : 
+        for j in i : 
+            a+=str(j)
+    return(int(a))
 
 # From a hash, create a Grid
 def get_grid_from_hash(m,n,hash):
@@ -205,6 +221,15 @@ class Grid():
             
         return a
 
+    def etat_possible_to_haschage2(self):
+        etat_poss=self.etat_possible()
+        #print(etat_poss)
+        a = [row[:] for row in etat_poss]
+        for i in range(len(etat_poss)):
+            
+            a[i]=(etat_poss[i][0],global_haschage2(etat_poss[i][1]))
+            
+        return a
     # def grid_to_graph(self):
     #     graph = {}
 
@@ -282,12 +307,47 @@ class Grid():
 
         self.visited = []
         explore_state(self.hashage())
-
-
         return graph
+    
+    def grid_to_graph2(self): #fonctionne avec la nouvelle fonction de haschage et donc piur tout les grilles possibles
+        graph = Graph()
+
+        # def add_edge(node1, node2):
+        #     if node1 not in graph:
+        #         graph[node1] = []
+        #     graph[node1].append(node2)
+
+        def explore_state2(gridHash):
+            print ('explorer state ')
+            print (gridHash)
+            gridToManipulate = get_grid_from_hash2(self.m, self.n, gridHash)
+            # current_hash = self.haschage()
+            current_hash = gridHash
+            self.visited.append(gridHash)
+
+            possible_states =  gridToManipulate.etat_possible_to_haschage2()
+
+            for move, next_state_hash in possible_states:
+                print ("->" + str(next_state_hash))
+                graph.add_edge(current_hash, next_state_hash)
+
+                if next_state_hash not in self.visited:
+                    explore_state2(next_state_hash)
+
+        self.visited = []
+        explore_state2(self.hashage2())
+        return graph
+
+
+
+
 
     def hashage(self):
         return global_haschage(self.state)
+    
+    def hashage2(self):
+        return global_haschage2(self.state)
+    
     
           
 
