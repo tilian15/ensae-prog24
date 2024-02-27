@@ -11,7 +11,7 @@ def heuristique(self):
         for i in range(len(self)):
             for j in range(len(self[0])):
                 indice+=1
-                if self[i][j]==indice : 
+                if self[i][j]!=indice : 
                     cpt+=1
 
 

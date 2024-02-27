@@ -359,7 +359,7 @@ class Grid():
         for i in range(self.m):
             for j in range(self.n):
                 indice+=1
-                if self.state[i][j]==indice : 
+                if self.state[i][j]!=indice : 
                     cpt+=1
 
         return cpt
