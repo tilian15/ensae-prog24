@@ -34,6 +34,7 @@ print(g.hashage2())
 # print("bonne ligne")
 
 print(g)
+print(g.heuristique())
 
 
 
@@ -45,24 +46,27 @@ G2= Graph.graph_from_file("../input/graph1.in")
 
 g.swap_seq([((0,0),(1,0)),((1,2),(1,1)),((1,1),(1,0))])
 
+print(g.heuristique())
+
 #g.swap_seq([((0,0),(1,0))])
 
 print(g)
+print(g.state[0])
 
 A=g.grid_to_graph2()
-#print(A)
+# #print(A)
 print(A.bfs2(g.hashage2(),global_haschage2([[1,2,3],[4,5,6]])))
 
 
-#les lignes suivantes permettent d'afficher correctement le chemin de résolution
-#------------
-B=[a for a in A.bfs2(g.hashage2(),global_haschage2([[1,2,3],[4,5,6]]))]
-print("BBBBB")
-print(B)
-for i in range(len(B)):
-    B[i]= get_grid_from_hashfinal(B[i])
-print(B)
-#------------
+# #les lignes suivantes permettent d'afficher correctement le chemin de résolution
+# #------------
+# B=[a for a in A.bfs2(g.hashage2(),global_haschage2([[1,2,3],[4,5,6]]))]
+# print("BBBBB")
+# print(B)
+# for i in range(len(B)):
+#     B[i]= get_grid_from_hashfinal(B[i])
+# print(B)
+# #------------
 
 
 #print(A.bfs2(g.hashage(),123456))

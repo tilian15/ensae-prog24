@@ -353,7 +353,17 @@ class Grid():
     def hashage2(self):
         return global_haschage2(self.state)
     
-    
+    def heuristique(self):
+        cpt=0
+        indice=0
+        for i in range(self.m):
+            for j in range(self.n):
+                indice+=1
+                if self.state[i][j]==indice : 
+                    cpt+=1
+
+        return cpt
+
           
 
         

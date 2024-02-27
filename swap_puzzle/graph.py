@@ -1,7 +1,21 @@
 """
 This is the graph module. It contains a minimalistic Graph class.
 """
+from grid import get_grid_from_hashfinal
+from grid import get_grid_from_hash2
+from grid import heuristique
 
+def heuristique(self):
+        cpt=0
+        indice=0
+        for i in range(len(self)):
+            for j in range(len(self[0])):
+                indice+=1
+                if self[i][j]==indice : 
+                    cpt+=1
+
+
+import heapq
 class Graph:
     """
     A class representing undirected graphs as adjacency lists. 
@@ -188,6 +202,39 @@ class Graph:
             
         result.reverse()
         return result
+
+    def a_star(self, start, goal): #ne fonctionnera uniquement pour swap_puzzle
+        frontier = []
+        heapq.heappush(frontier, (0, start))  # (priority, node)
+        came_from = {}
+        cost_so_far = {}
+        came_from[start] = None
+        cost_so_far[start] = 0
+
+        while frontier:
+            current_cost, current_node = heapq.heappop(frontier)
+
+            if current_node == goal:
+                break
+
+            for next_node in self.graph[current_node]: # Accéder à la liste des voisins du nœud actuel dans le graphe
+                new_cost = cost_so_far[current_node] + 1  # On suppose que le coût de chaque mouvement est 1
+                if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
+                    cost_so_far[next_node] = new_cost
+                    priority = new_cost + get_grid_from_hash2(next_node).heuristique()
+                    heapq.heappush(frontier, (priority, next_node))
+                    came_from[next_node] = current_node
+
+    # Reconstruct path
+        path = []
+        node = goal
+        while node != start:
+            path.append(node)
+            node = came_from[node]
+        path.append(start)
+        path.reverse()
+
+        return path
 
             
 
