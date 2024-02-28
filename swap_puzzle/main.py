@@ -5,7 +5,7 @@ from solver import Solver
 g = Grid(2, 3)
 print(g)
 print(g.state)
-print(g.hashage2())
+# print(g.hashage2())
 
 # print("caca")
 # # # print (g.is_sorted())
@@ -33,9 +33,9 @@ print(g.hashage2())
 # g.bonne_ligne(6)
 # print("bonne ligne")
 
-print(g)
-print("----heuristique2 avec grille non modifiée ")
-print(g.heuristique2())
+# print(g)
+# print("----heuristique2 avec grille non modifiée ")
+# print(g.heuristique2())
 
 
 
@@ -43,25 +43,26 @@ print(g.heuristique2())
 from graph import Graph
 # G=Graph([1,2])
 # print(G)
-G2= Graph.graph_from_file("../input/graph1.in")
+#G2= Graph.graph_from_file("../input/graph1.in")
 
 g.swap_seq([((0,0),(1,0)),((1,2),(1,1)),((1,1),(1,0))])
 
-print("---heuristique1")
-print(g.heuristique())
+# print("---heuristique1")
+# print(g.heuristique())
 
-print("----heuristique2 avec grille modifiée ")
+# print("----heuristique2 avec grille modifiée ")
 
-print(g.heuristique2())
+# print(g.heuristique2())
 
 #g.swap_seq([((0,0),(1,0))])
 
 print(g)
 #print(g.state[0])
 
-#A=g.grid_to_graph2()
-# #print(A)
-#print(A.bfs2(g.hashage2(),global_haschage2([[1,2,3],[4,5,6]])))
+A=g.grid_to_graph2()
+
+#print(A)
+#print(A.a_star(g.hashage2(),global_haschage2([[1,2,3],[4,5,6]])))
 
 
 # #les lignes suivantes permettent d'afficher correctement le chemin de résolution

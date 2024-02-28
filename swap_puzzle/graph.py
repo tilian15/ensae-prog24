@@ -2,17 +2,18 @@
 This is the graph module. It contains a minimalistic Graph class.
 """
 # from grid import get_grid_from_hashfinal
-# from grid import get_grid_from_hash2
+#from grid import Grid 
+from grid import get_grid_from_hash2
 
 
-def heuristique(self):
-        cpt=0
-        indice=0
-        for i in range(len(self)):
-            for j in range(len(self[0])):
-                indice+=1
-                if self[i][j]!=indice : 
-                    cpt+=1
+# def heuristique(self):
+#         cpt=0
+#         indice=0
+#         for i in range(len(self)):
+#             for j in range(len(self[0])):
+#                 indice+=1
+#                 if self[i][j]!=indice : 
+#                     cpt+=1
 
 
 import heapq
@@ -221,6 +222,7 @@ class Graph:
                 new_cost = cost_so_far[current_node] + 1  # On suppose que le coût de chaque mouvement est 1
                 if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
                     cost_so_far[next_node] = new_cost
+                    print('caca')
                     priority = new_cost + get_grid_from_hash2(next_node).heuristique()
                     #priority = new_cost + get_grid_from_hash2(next_node).heuristique2()
                     heapq.heappush(frontier, (priority, next_node))

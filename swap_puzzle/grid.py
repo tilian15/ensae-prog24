@@ -333,6 +333,7 @@ class Grid():
             possible_states =  gridToManipulate.etat_possible_to_haschage2()
 
             for move, next_state_hash in possible_states:
+                
                 print ("->" + str(next_state_hash))
                 graph.add_edge(current_hash, next_state_hash)
 
