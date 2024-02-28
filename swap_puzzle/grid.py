@@ -361,6 +361,26 @@ class Grid():
                 indice+=1
                 if self.state[i][j]!=indice : 
                     cpt+=1
+        return cpt
+
+    def heuristique2(self):
+        cpt=0
+        for i in range(self.m):
+            for j in range(self.n):
+                a=self.state[i][j]
+                if a%self.n == 0 :
+                    bonne_ligne = a//(self.n+1) 
+                else :
+                    bonne_ligne = a //self.n
+                cpt+=abs(bonne_ligne - i)
+                if a %self.n==0 : 
+                    bonne_colonne = self.n -1
+                else : 
+                    bonne_colonne= a%self.n -1
+                cpt+=abs( j - bonne_colonne)
+        
+        return cpt/2 #on divise par 2 car on compte les mouvements 2 fois comme à chaque fois on 'inverse' 2 cases 
+
 
         return cpt
 
