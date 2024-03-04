@@ -2,7 +2,9 @@ import sys
 sys.path.append("swap_puzzle/")
 
 import unittest 
-from grid import Grid
+import grid as gridLib
+import graph as graphLib
+
 
 class Test_Swap(unittest.TestCase):
 
@@ -57,7 +59,7 @@ class Test_Swap(unittest.TestCase):
 
 
     def test_grid4(self):
-         grid = Grid(2,2)
+         grid = gridLib.Grid(2,2)
          print(grid)
          grid.swap((0,0), (0,1))
          grid.swap((1,0), (1,1))

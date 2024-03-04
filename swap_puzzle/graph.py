@@ -3,7 +3,8 @@ This is the graph module. It contains a minimalistic Graph class.
 """
 # from grid import get_grid_from_hashfinal
 #from grid import Grid 
-from grid import get_grid_from_hash2
+import grid
+# from grid import get_grid_from_hash2
 
 
 # def heuristique(self):
@@ -172,8 +173,7 @@ class Graph:
         #if we found the dst
         found = False           
         while len(nodes_todo)>0 and not found :
-
-                
+                         
             node_to_analyse = nodes_todo.pop(0) 
             for n in self.graph[node_to_analyse]:
                 if n not in nodes_done:
@@ -223,7 +223,7 @@ class Graph:
                 if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
                     cost_so_far[next_node] = new_cost
                     print('caca')
-                    priority = new_cost + get_grid_from_hash2(next_node).heuristique()
+                    priority = new_cost + grid.pbo_get_grid_from_hash(next_node).heuristique()
                     #priority = new_cost + get_grid_from_hash2(next_node).heuristique2()
                     heapq.heappush(frontier, (priority, next_node))
                     came_from[next_node] = current_node

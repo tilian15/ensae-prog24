@@ -1,18 +1,52 @@
 """
 This is the grid module. It contains the Grid class and its associated methods.
 """
-from graph import Graph 
+import graph as graphLib
 import random
 import numpy as np 
 
 dic2={}
 cpt=0
-def global_haschage2(values):
-    global cpt 
-    if str(values) not in dic2:
-        dic2[str(values)]=cpt
-        cpt=cpt+1
-    return dic2[str(values)]
+
+def global_haschage2bis(tab): #haschage à partir d'un tablo
+    n=len(tab[0])
+    m=len(tab)
+    pre = str(m) + ';' + str(n)
+    for i in range(0,m):
+        for j in range(0,n):
+            pre = pre + ";" + str(tab[i][j])
+    return pre
+
+
+def global_haschage2(aGrid):
+    print(aGrid)
+    pre =  str(aGrid.m) + ";" +  str(aGrid.n) 
+    for i in range(0,aGrid.m):
+        for j in range(0,aGrid.n):
+            pre = pre + ";" + str(aGrid.state[i][j])
+    return pre
+    
+def pbo_get_grid_from_hash(hash):
+    l = hash.split(';')
+    m = int(l[0])
+    n = int(l[1])
+    index = 2
+    state = []
+    for i in range (0,m):
+        line = []
+        for j in range (0,n):
+            line.append(int(l[index]))
+            index = index + 1
+        state.append(line)
+    return Grid(m,n,state)
+
+
+# def global_haschage2(values):
+#     global cpt 
+#     if str(values) not in dic2:
+#         dic2[str(values)]=cpt
+#         cpt=cpt+1
+#     return dic2[str(values)]
 
 def get_grid_from_hash2(m,n,values):
     for i in dic2:
@@ -216,6 +250,24 @@ class Grid():
                 self.swap((k+1,y),(k,y))
         return l 
     
+    def etat_possible2(self):
+        l=[]
+        for j in range(len(self.state)):
+            for i in range(len(self.state[0])-1):
+                self.swap((j,i+1),(j,i))
+                
+                a = [row[:] for row in self.state]
+                #print(a)
+                l.append(a)  #probleme (résolu), le a qui est ajouté a la liste n'est pas le meme que celui afficher au dessus, pb resolu grace a une copie de self.state
+                self.swap((j,i+1),(j,i))
+        for y in range(len(self.state[0])):
+            for k in range(len(self.state)-1):
+                self.swap((k+1,y),(k,y))
+                a = [row[:] for row in self.state]
+                l.append(a)
+                self.swap((k+1,y),(k,y))
+        return l
+    
     def etat_possible_to_haschage(self):
         etat_poss=self.etat_possible()
         #print(etat_poss)
@@ -232,7 +284,7 @@ class Grid():
         a = [row[:] for row in etat_poss]
         for i in range(len(etat_poss)):
             
-            a[i]=(etat_poss[i][0],global_haschage2(etat_poss[i][1]))
+            a[i]=(etat_poss[i][0],global_haschage2bis(etat_poss[i][1]))
             
         return a
     # def grid_to_graph(self):
@@ -315,7 +367,7 @@ class Grid():
         return graph
     
     def grid_to_graph2(self): #fonctionne avec la nouvelle fonction de haschage et donc piur tout les grilles possibles
-        graph = Graph()
+        graph = graphLib.Graph()
 
         # def add_edge(node1, node2):
         #     if node1 not in graph:
@@ -325,14 +377,16 @@ class Grid():
         def explore_state2(gridHash):
             print ('explorer state ')
             print (gridHash)
-            gridToManipulate = get_grid_from_hash2(self.m, self.n, gridHash)
+            #gridToManipulate = get_grid_from_hash2(self.m, self.n, gridHash)
+            gridToManipulate = pbo_get_grid_from_hash(gridHash)
+
             # current_hash = self.haschage()
             current_hash = gridHash
             self.visited.append(gridHash)
 
             possible_states =  gridToManipulate.etat_possible_to_haschage2()
 
-            for move, next_state_hash in possible_states:
+            for move, next_state_hash in possible_states: 
                 
                 print ("->" + str(next_state_hash))
                 graph.add_edge(current_hash, next_state_hash)
@@ -352,7 +406,7 @@ class Grid():
         return global_haschage(self.state)
     
     def hashage2(self):
-        return global_haschage2(self.state)
+        return global_haschage2(self)
     
     def heuristique(self):
         cpt=0
