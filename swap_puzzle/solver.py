@@ -1,6 +1,31 @@
 from grid import Grid
 import matplotlib.pyplot as plt
 from matplotlib.table import Table
+import heapq
+
+
+def heuristique2(self):
+        #self=global_haschage2bis(a)
+        cpt=0
+        m=len(self) #nbre de ligne
+        n = len(self[0]) #nbre de colonne
+        for i in range(m):
+            for j in range(n):
+                a=self[i][j]
+                if a%n == 0 :
+                    bonne_ligne = a//(n+1) 
+                else :
+                    bonne_ligne = a //n
+                cpt+=abs(bonne_ligne - i)
+                if a %n==0 : 
+                    bonne_colonne = n -1
+                else : 
+                    bonne_colonne= a%n -1
+                cpt+=abs( j - bonne_colonne)
+        
+        return cpt/2
+
+print(heuristique2([[4,2,3],[1,5,6]]))
 
 def swap(self, cell1, cell2):
         """
@@ -37,6 +62,14 @@ def etat_possible2(self):
         return l
 
 
+def global_haschage2(aGrid): #haschage à partir d'une grille grid
+    print(aGrid)
+    pre =  str(aGrid.m) + ";" +  str(aGrid.n) 
+    for i in range(0,aGrid.m):
+        for j in range(0,aGrid.n):
+            pre = pre + ";" + str(aGrid.state[i][j])
+    return pre
+
 def global_haschage2bis(tab): #haschage à partir d'un tablo
     n=len(tab[0])
     m=len(tab)
@@ -46,7 +79,7 @@ def global_haschage2bis(tab): #haschage à partir d'un tablo
             pre = pre + ";" + str(tab[i][j])
     return pre
 
-print(etat_possible2([[1,2,3],[4,5,6]]))
+#print(etat_possible2([[1,2,3],[4,5,6]]))
 
 class Solver(): 
     """
@@ -117,6 +150,45 @@ class Solver():
         result.reverse()
         return result
     # complexité (n+m)*n*m
+
+
+
+    def a_star(self): #ne fonctionnera uniquement pour swap_puzzle
+        goal = Grid(self.grid.m,self.grid.n) 
+        frontier = []
+        heapq.heappush(frontier, (0, self.grid.state))  # (priority, node)
+        came_from = {}
+        cost_so_far = {}
+        came_from[global_haschage2bis(self.grid.state)] = None
+        cost_so_far[global_haschage2bis(self.grid.state)] = 0
+
+        while len(frontier) > 0 :
+            current_cost, current_node = heapq.heappop(frontier)
+
+            if current_node == global_haschage2(goal):
+                break
+
+            for next_node in etat_possible2(current_node): # Accéder à la liste des voisins du nœud actuel dans le graphe
+                new_cost = cost_so_far[global_haschage2bis(current_node)] + 1  # On suppose que le coût de chaque mouvement est 1
+                if global_haschage2bis(next_node) not in cost_so_far or new_cost < cost_so_far[global_haschage2bis(next_node)]:
+                    cost_so_far[global_haschage2bis(next_node)] = new_cost
+                    print('caca')
+                    priority = new_cost + heuristique2(next_node)
+                    #priority = new_cost + get_grid_from_hash2(next_node).heuristique2()
+                    heapq.heappush(frontier, (priority, next_node))
+                    came_from[global_haschage2bis(next_node)] = current_node
+
+    # Reconstruct path
+        path = []
+        node = goal.state
+        while node != self.grid.state:
+            path.append(node)
+            node = came_from[global_haschage2bis(node)]
+        path.append(self.grid.state)
+        path.reverse()
+        print("chemin issu de A*")
+
+        return path
 
     
 

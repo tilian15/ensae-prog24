@@ -173,7 +173,7 @@ class Graph:
         #if we found the dst
         found = False           
         while len(nodes_todo)>0 and not found :
-                         
+
             node_to_analyse = nodes_todo.pop(0) 
             for n in self.graph[node_to_analyse]:
                 if n not in nodes_done:
@@ -209,7 +209,7 @@ class Graph:
         heapq.heappush(frontier, (0, start))  # (priority, node)
         came_from = {}
         cost_so_far = {}
-        came_from[start] = None
+        came_from[start] = None 
         cost_so_far[start] = 0
 
         while frontier:

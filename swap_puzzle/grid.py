@@ -8,7 +8,7 @@ import numpy as np
 dic2={}
 cpt=0
 
-def global_haschage2bis(tab): #haschage à partir d'un tablo
+def global_haschage2bis(tab): #haschage à partir d'un tablo [[]]
     n=len(tab[0])
     m=len(tab)
     pre = str(m) + ';' + str(n)
@@ -18,7 +18,7 @@ def global_haschage2bis(tab): #haschage à partir d'un tablo
     return pre
 
 
-def global_haschage2(aGrid):
+def global_haschage2(aGrid): #haschage à partir d'une grille grid
     print(aGrid)
     pre =  str(aGrid.m) + ";" +  str(aGrid.n) 
     for i in range(0,aGrid.m):
@@ -436,8 +436,6 @@ class Grid():
         
         return cpt/2 #on divise par 2 car on compte les mouvements 2 fois comme à chaque fois on 'inverse' 2 cases 
 
-
-        return cpt
 
           
 

@@ -12,18 +12,39 @@ print(g.state)
 
 #print(g.etat_possible())
 
+#----------- Verifier question 8 
+# g = Grid(2, 3)
+# g.swap_seq([((0,0),(1,0)),((1,2),(1,1))])
+# g=Solver(g)
+# print(g.bfs2())
+#--------------------
+
+
+
+#------------A * 
+print("---------A*----------------")
+g = Grid(2, 3)
+g.swap_seq([((0,0),(1,0)),((1,2),(1,1))])
+g=Solver(g)
+print(g.a_star())
+#----------
+
+
+
+
+
 # print("a")
 # print(g.haschage())
-g.swap_seq([((0,0),(1,0)),((1,2),(1,1))])
+#g.swap_seq([((0,0),(1,0)),((1,2),(1,1))])
 # # print(g)
 # # print("les coord sont")
 # # print(g.coordonne(2))
 # print(g)
-g=Solver(g)
+#g=Solver(g)
 # print("reee ")
 # # g.bonne_colonne(3)
 
-print(g.bfs2())
+#print(g.bfs2())
 #print(g.get_solution_naive())
 
 
@@ -49,7 +70,7 @@ from graph import Graph
 # print(G)
 #G2= Graph.graph_from_file("../input/graph1.in")
 
-g.swap_seq([((0,0),(1,0)),((1,2),(1,1)),((1,1),(1,0))])
+#g.swap_seq([((0,0),(1,0)),((1,2),(1,1)),((1,1),(1,0))])
 
 # print("---heuristique1")
 # print(g.heuristique())
@@ -60,16 +81,16 @@ g.swap_seq([((0,0),(1,0)),((1,2),(1,1)),((1,1),(1,0))])
 
 #g.swap_seq([((0,0),(1,0))])
 
-print(g)
+#print(g)
 #print(g.state[0])
 
-A=g.grid_to_graph2()
+#A=g.grid_to_graph2()
 
 #print(A)
 #print(A.a_star(g.hashage2(),global_haschage2([[1,2,3],[4,5,6]])))
 
 
-# #les lignes suivantes permettent d'afficher correctement le chemin de résolution
+# #les lignes suivantes permettent d'afficher correctement le chemin de résolution à l'aide de bfs pour la question 7 
 # #------------
 # B=[a for a in A.bfs2(g.hashage2(),global_haschage2([[1,2,3],[4,5,6]]))]
 # print("BBBBB")
