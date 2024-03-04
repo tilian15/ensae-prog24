@@ -2,24 +2,51 @@ from grid import Grid
 import matplotlib.pyplot as plt
 from matplotlib.table import Table
 
+def swap(self, cell1, cell2):
+        """
+        Implements the swap operation between two cells. Raises an exception if the swap is not allowed.
+
+        Parameters: 
+        -----------
+        cell1, cell2: tuple[int]
+            The two cells to swap. They must be in the format (i, j) where i is the line and j the column number of the cell. 
+        """
+        if (cell1[0] == cell2[0] and abs(cell1[1]-cell2[1]) == 1) or (cell1[1] == cell2[1] and abs(cell1[0]-cell2[0]) == 1): #verifie si la distance est bien égale à 1 et que les 2 cases sont cote à cote
+            self[cell1[0]][cell1[1]], self[cell2[0]][cell2[1]] = self[cell2[0]][cell2[1]], self[cell1[0]][cell1[1]]
+        else:
+            print("error unavailable swap")
+            print(cell1,cell2)
+        return self
+
 def etat_possible2(self):
         l=[]
+        a = [row[:] for row in self]
         for j in range(len(self)):
-            for i in range(len(self[0])):
-                self.swap((j,i+1),(j,i))
-                
-                a = [row[:] for row in self.state]
+            for i in range(len(self[0])-1):
+                a=swap(a,(j,i+1),(j,i))
+                b = [row[:] for row in a]
                 #print(a)
-                l.append(a)  #probleme (résolu), le a qui est ajouté a la liste n'est pas le meme que celui afficher au dessus, pb resolu grace a une copie de self.state
-                self.swap((j,i+1),(j,i))
-        for y in range(len(self.state[0])):
-            for k in range(len(self.state)-1):
-                self.swap((k+1,y),(k,y))
-                a = [row[:] for row in self.state]
-                l.append(a)
-                self.swap((k+1,y),(k,y))
+                l.append(b) 
+                a=swap(a,(j,i+1),(j,i))
+        for y in range(len(self[0])):
+            for k in range(len(self)-1):
+                a=swap(a,(k+1,y),(k,y))
+                b = [row[:] for row in a]
+                l.append(b)
+                a=swap(a,(k+1,y),(k,y))
         return l
 
+
+def global_haschage2bis(tab): #haschage à partir d'un tablo
+    n=len(tab[0])
+    m=len(tab)
+    pre = str(m) + ';' + str(n)
+    for i in range(0,m):
+        for j in range(0,n):
+            pre = pre + ";" + str(tab[i][j])
+    return pre
+
+print(etat_possible2([[1,2,3],[4,5,6]]))
 
 class Solver(): 
     """
@@ -54,11 +81,11 @@ class Solver():
 
     def bfs2(self): #Question 8, ce bfs ne fonctionnera que pour swap_puzzle 
         dst = Grid(self.grid.m,self.grid.n)    
-        print("From "  + str(self.grid.state) + ' to ' + str(dst.grid.state))
+        print("From "  + str(self.grid.state) + ' to ' + str(dst.state))
         nodes_done = []
         nodes_todo = [self.grid.state]
         predecessors = {}
-        predecessors = {self.grid.state: 0}
+        predecessors = {global_haschage2bis(self.grid.state): 0}
         #if we found the dst
         found = False           
         while len(nodes_todo)>0 and not found :             
@@ -67,9 +94,9 @@ class Solver():
                 if n not in nodes_done:
                     if (n not in nodes_todo) :
                         nodes_todo.append(n)
-                        predecessors[n] = node_to_analyse
+                        predecessors[global_haschage2bis(n)] = node_to_analyse
                     #to exit the while
-                    if (n == dst):
+                    if (n == dst.state):
                         found = True
 
             nodes_done.append(node_to_analyse)
@@ -82,13 +109,11 @@ class Solver():
             
             
         result = []            
-        previous = dst
-        while (predecessors[previous] != 0):
+        previous = dst.state
+        while (predecessors[global_haschage2bis(previous)] != 0):
             result.append(previous)
-            previous = predecessors[previous]
+            previous = predecessors[global_haschage2bis(previous)]
         result.append(previous)
-
-            
         result.reverse()
         return result
     # complexité (n+m)*n*m

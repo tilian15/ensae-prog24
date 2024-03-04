@@ -14,15 +14,19 @@ print(g.state)
 
 # print("a")
 # print(g.haschage())
-#g.swap_seq([((0,0),(1,0)),((1,2),(1,1))])
+g.swap_seq([((0,0),(1,0)),((1,2),(1,1))])
 # # print(g)
 # # print("les coord sont")
 # # print(g.coordonne(2))
 # print(g)
-#g=Solver(g)
+g=Solver(g)
 # print("reee ")
 # # g.bonne_colonne(3)
+
+print(g.bfs2())
 #print(g.get_solution_naive())
+
+
 # print("pipi")
 # print(g)
 # print(g)
