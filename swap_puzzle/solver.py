@@ -2,30 +2,11 @@ from grid import Grid
 import matplotlib.pyplot as plt
 from matplotlib.table import Table
 import heapq
+import time
 
-
-def heuristique2(self):
-        #self=global_haschage2bis(a)
-        cpt=0
-        m=len(self) #nbre de ligne
-        n = len(self[0]) #nbre de colonne
-        for i in range(m):
-            for j in range(n):
-                a=self[i][j]
-                if a%n == 0 :
-                    bonne_ligne = a//(n+1) 
-                else :
-                    bonne_ligne = a //n
-                cpt+=abs(bonne_ligne - i)
-                if a %n==0 : 
-                    bonne_colonne = n -1
-                else : 
-                    bonne_colonne= a%n -1
-                cpt+=abs( j - bonne_colonne)
-        
-        return cpt/2
-
-print(heuristique2([[4,2,3],[1,5,6]]))
+# Function to centralize severals solvers
+# Each function will return following tuple
+# ( nb of move, time, array of grid)
 
 def swap(self, cell1, cell2):
         """
@@ -48,27 +29,16 @@ def etat_possible2(self):
         a = [row[:] for row in self]
         for j in range(len(self)):
             for i in range(len(self[0])-1):
-                a=swap(a,(j,i+1),(j,i))
                 b = [row[:] for row in a]
-                #print(a)
+                b= swap(b,(j,i+1),(j,i))
                 l.append(b) 
-                a=swap(a,(j,i+1),(j,i))
         for y in range(len(self[0])):
             for k in range(len(self)-1):
-                a=swap(a,(k+1,y),(k,y))
                 b = [row[:] for row in a]
+                b=swap(b,(k+1,y),(k,y))
                 l.append(b)
-                a=swap(a,(k+1,y),(k,y))
+
         return l
-
-
-def global_haschage2(aGrid): #haschage à partir d'une grille grid
-    print(aGrid)
-    pre =  str(aGrid.m) + ";" +  str(aGrid.n) 
-    for i in range(0,aGrid.m):
-        for j in range(0,aGrid.n):
-            pre = pre + ";" + str(aGrid.state[i][j])
-    return pre
 
 def global_haschage2bis(tab): #haschage à partir d'un tablo
     n=len(tab[0])
@@ -79,7 +49,6 @@ def global_haschage2bis(tab): #haschage à partir d'un tablo
             pre = pre + ";" + str(tab[i][j])
     return pre
 
-#print(etat_possible2([[1,2,3],[4,5,6]]))
 
 class Solver(): 
     """
@@ -96,23 +65,69 @@ class Solver():
         Solves the grid and returns the sequence of swaps at the format 
         [((i1, j1), (i2, j2)), ((i1', j1'), (i2', j2')), ...]. 
         """
-        affichage(self.grid.state)
+        start_time = time.time()
+        clone = self.grid.clone()
+
         sequence = []
         for i in range(1,(self.grid.n * self.grid.m) +1 ):
-            print("toto")
             sequence2=[]
             sequence2+=self.grid.bonne_colonne(i)
-            #print(f"bonne colonne {i} ok")
             sequence2+=self.grid.bonne_ligne(i)
-            #print(f"bonne ligne {i} ok")
             sequence+=sequence2
-            if len(sequence2) !=0 : 
-                affichage(self.grid.state)
-            print(self.grid)
-        return sequence
+        
+        result = [clone.clone()]
+        for a in sequence:
+
+             clone.swap_seq([a])
+             result.append(clone.clone())
+            
+        return (time.time() - start_time, len(result) - 1, result)
+
         
 
-    def bfs2(self): #Question 8, ce bfs ne fonctionnera que pour swap_puzzle 
+    def bfs2(self): #Question 8, ce bfs ne fonctionnera que pour swap_puzzle
+        start_time = time.time()
+        dst = Grid(self.grid.m,self.grid.n)            
+        grids_done = []
+        grids_todo = [self.grid]
+        predecessors = {}
+        predecessors = {self.grid: 0}
+        #if we found the dst
+        found = False
+        if (dst == self.grid):
+            found = True
+        while len(grids_todo)>0 and not found :
+            grid_to_analyse = grids_todo.pop(0)
+            
+            
+            for n in grid_to_analyse.grid_possible(): 
+                if n not in grids_done:
+                    if (n not in grids_todo) :
+                        grids_todo.append(n)
+                        predecessors[n] = grid_to_analyse
+                    #to exit the while
+                    if (n == dst):
+                        found = True
+
+            grids_done.append(grid_to_analyse)
+        if not found:
+            return None 
+                   
+        
+            
+        result = []            
+        previous = dst
+        while (predecessors[previous] != 0):
+            result.append(previous)
+            previous = predecessors[previous]
+        result.append(previous)
+        result.reverse()
+        return (time.time() - start_time, len(result) -1 , result)
+    # complexité (n+m)*n*m
+
+
+    def bfs2_optimise(self): #Question 8, ce bfs ne fonctionnera que pour swap_puzzle 
+        start_time = time.time()
         dst = Grid(self.grid.m,self.grid.n)    
         print("From "  + str(self.grid.state) + ' to ' + str(dst.state))
         nodes_done = []
@@ -120,7 +135,9 @@ class Solver():
         predecessors = {}
         predecessors = {global_haschage2bis(self.grid.state): 0}
         #if we found the dst
-        found = False           
+        found = False
+        if (dst == self.grid):
+            found = True           
         while len(nodes_todo)>0 and not found :             
             node_to_analyse = nodes_todo.pop(0) 
             for n in etat_possible2(node_to_analyse):
@@ -135,79 +152,88 @@ class Solver():
             nodes_done.append(node_to_analyse)
         if not found:
             return None 
-                   
-        print ('Predecessors-----------')
-        print(predecessors)
 
             
             
         result = []            
         previous = dst.state
         while (predecessors[global_haschage2bis(previous)] != 0):
-            result.append(previous)
+            result.append(Grid(self.grid.m, self.grid.n,previous))
             previous = predecessors[global_haschage2bis(previous)]
-        result.append(previous)
+        result.append(Grid(self.grid.m, self.grid.n,previous))
         result.reverse()
-        return result
+        return (time.time() - start_time, len(result) -1 , result)
     # complexité (n+m)*n*m
 
-
-
     def a_star(self): #ne fonctionnera uniquement pour swap_puzzle
+        start_time = time.time()
         goal = Grid(self.grid.m,self.grid.n) 
         frontier = []
-        heapq.heappush(frontier, (0, self.grid.state))  # (priority, node)
+        heapq.heappush(frontier, (0, self.grid))  # (priority, node)
         came_from = {}
         cost_so_far = {}
-        came_from[global_haschage2bis(self.grid.state)] = None
-        cost_so_far[global_haschage2bis(self.grid.state)] = 0
-
+        came_from[self.grid] = None
+        cost_so_far[self.grid] = 0
         while len(frontier) > 0 :
             current_cost, current_node = heapq.heappop(frontier)
-
-            if current_node == global_haschage2(goal):
+            if current_node == goal:
                 break
-
-            for next_node in etat_possible2(current_node): # Accéder à la liste des voisins du nœud actuel dans le graphe
-                new_cost = cost_so_far[global_haschage2bis(current_node)] + 1  # On suppose que le coût de chaque mouvement est 1
-                if global_haschage2bis(next_node) not in cost_so_far or new_cost < cost_so_far[global_haschage2bis(next_node)]:
-                    cost_so_far[global_haschage2bis(next_node)] = new_cost
-                    print('caca')
-                    priority = new_cost + heuristique2(next_node)
-                    #priority = new_cost + get_grid_from_hash2(next_node).heuristique2()
+            for next_node in current_node.grid_possible(): # Accéder à la liste des voisins du nœud actuel dans le graphe
+                new_cost = cost_so_far[current_node] + 1  # On suppose que le coût de chaque mouvement est 1
+                if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
+                    cost_so_far[next_node] = new_cost
+                    priority = new_cost + next_node.heuristique3()                    
                     heapq.heappush(frontier, (priority, next_node))
-                    came_from[global_haschage2bis(next_node)] = current_node
-
-    # Reconstruct path
+                    came_from[next_node] = current_node
         path = []
-        node = goal.state
-        while node != self.grid.state:
+        node = goal
+        while node != self.grid:
             path.append(node)
-            node = came_from[global_haschage2bis(node)]
-        path.append(self.grid.state)
+            node = came_from[node]
+        path.append(self.grid)
         path.reverse()
         print("chemin issu de A*")
 
-        return path
+        return (time.time() - start_time, len(path) - 1 , path)
+    
+
+    def a_star_ancienne_heuristique(self): #ne fonctionnera uniquement pour swap_puzzle
+        start_time = time.time()
+        goal = Grid(self.grid.m,self.grid.n) 
+        frontier = []
+        heapq.heappush(frontier, (0, self.grid))  # (priority, node)
+        came_from = {}
+        cost_so_far = {}
+        came_from[self.grid] = None
+        cost_so_far[self.grid] = 0
+        while len(frontier) > 0 :
+            current_cost, current_node = heapq.heappop(frontier)
+            if current_node == goal:
+                break
+            for next_node in current_node.grid_possible(): # Accéder à la liste des voisins du nœud actuel dans le graphe
+                new_cost = cost_so_far[current_node] + 1  # On suppose que le coût de chaque mouvement est 1
+                if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
+                    cost_so_far[next_node] = new_cost
+                    priority = new_cost + next_node.heuristique()                    
+                    heapq.heappush(frontier, (priority, next_node))
+                    came_from[next_node] = current_node
+        path = []
+        node = goal
+        while node != self.grid:
+            path.append(node)
+            node = came_from[node]
+        path.append(self.grid)
+        path.reverse()
+        print("chemin issu de A*")
+
+        return (time.time() - start_time, len(path) - 1 , path)
 
     
 
-
-        # TODO: implement this function (and remove the line "raise NotImplementedError").
-        # NOTE: you can add other methods and subclasses as much as necessary. The only thing imposed is the format of the solution returned.
-       
-
-def affichage(data):
-    fig, ax = plt.subplots()
-    ax.axis('off')  # Hide axis
-    rows, cols = len(data), len(data[0])
-    table = Table(ax, bbox=[0, 0, 1, 1], loc='center')
-
-    for i in range(rows):
-        for j in range(cols):
-            table.add_cell(i, j, 1 / cols, 1 / rows, text=str(data[i][j]), loc='center')
-
-
-    ax.add_table(table)
-
-    plt.show()
+    @classmethod
+    def display(cls, tuple, displayGrid = False): 
+        print("Nb of swap : %s" %tuple[1])
+        print("Time : %s" %tuple[0])
+        if (displayGrid):
+            for grid in tuple[2]:
+                print(grid)

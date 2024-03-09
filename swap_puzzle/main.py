@@ -1,132 +1,90 @@
 from grid import Grid
-from grid import global_haschage2
-from grid import get_grid_from_hashfinal
+# from grid import global_haschage2
+# from grid import get_grid_from_hashfinal
+
+
+####
+# Exemple interessant
+# [7, 5, 3]
+# [2, 8, 6]
+# [4, 1, 9]
+# Solution Naive :
+# (0.0, 7, [<grid.Grid: m=3, n=3, state=[[7, 5, 3], [2, 8, 6], [4, 1, 9]]>, <grid.Grid: m=3, n=3, state=[[7, 5, 3], [2, 8, 6], [1, 4, 9]]>, <grid.Grid: m=3, n=3, state=[[7, 5, 3], [1, 8, 6], [2, 4, 9]]>, <grid.Grid: m=3, n=3, state=[[1, 5, 3], [7, 8, 6], [2, 4, 9]]>, <grid.Grid: m=3, n=3, state=[[1, 5, 3], [7, 8, 6], [4, 2, 9]]>, <grid.Grid: m=3, n=3, state=[[1, 5, 3], [7, 2, 6], [4, 8, 9]]>, <grid.Grid: m=3, 
+# n=3, state=[[1, 2, 3], [7, 5, 6], [4, 8, 9]]>, <grid.Grid: m=3, n=3, state=[[1, 2, 3], [4, 5, 6], [7, 8, 9]]>])
+# Nb of swap : 7
+# Time : 0.0
+# A* :
+# chemin issu de A*
+# Nb of swap : 5
+# Time : 0.003987312316894531
+# BSF :
+# Nb of swap : 5
+# Time : 354.874897480011
+
+
+
 from solver import Solver
-g = Grid(2, 3)
-print(g)
-print(g.state)
-# print(g.hashage2())
-
-# print("caca")
-# # # print (g.is_sorted())
-
-#print(g.etat_possible())
-
-#----------- Verifier question 8 
-# g = Grid(2, 3)
-# g.swap_seq([((0,0),(1,0)),((1,2),(1,1))])
-# g=Solver(g)
-# print(g.bfs2())
-#--------------------
+from ui import SwapGenerator
+g = Grid(3, 3)
 
 
+
+
+nb_row = 3
+nb_column = 3
+nb_swaps = 10
+display_grid_result = False
+
+gOriginal = Grid(nb_row, nb_column)
+swap_generator = SwapGenerator()
+swaps = swap_generator.generate_swaps(nb_swaps, nb_row, nb_column)
+print(swaps)
+
+
+
+gOriginal.swap_seq(swaps)
+print(gOriginal)
+
+#gOriginal = Grid(nb_row, nb_column, [[7, 5, 3],[2, 8, 6],[4, 1, 9]])
+#gOriginal = Grid(nb_row, nb_column, [[4,2],[3,1],[5,6]])
+
+
+print("Solution Naive :")
+g = gOriginal.clone()
+
+g=Solver(g)
+result = g.get_solution_naive()
+print(result)
+Solver.display(result, display_grid_result)
 
 #------------A * 
-print("---------A*----------------")
-g = Grid(2, 3)
-g.swap_seq([((0,0),(1,0)),((1,2),(1,1))])
+print("A* :")
+g = gOriginal.clone()
 g=Solver(g)
-print(g.a_star())
-#----------
+result = g.a_star()
+Solver.display(result, display_grid_result)
+# #----------
+
+#------------A * 
+print("A* ancienne heuristique :")
+g = gOriginal.clone()
+g=Solver(g)
+result = g.a_star_ancienne_heuristique()
+Solver.display(result, display_grid_result)
+
+
+print("BSF Optimize:")
+g = gOriginal.clone()
+g=Solver(g)
+result = g.bfs2_optimise()
+Solver.display(result, False)
+
+print("BSF:")
+g = gOriginal.clone()
+g=Solver(g)
+result = g.bfs2()
+Solver.display(result, False)
 
 
 
 
-
-# print("a")
-# print(g.haschage())
-#g.swap_seq([((0,0),(1,0)),((1,2),(1,1))])
-# # print(g)
-# # print("les coord sont")
-# # print(g.coordonne(2))
-# print(g)
-#g=Solver(g)
-# print("reee ")
-# # g.bonne_colonne(3)
-
-#print(g.bfs2())
-#print(g.get_solution_naive())
-
-
-# print("pipi")
-# print(g)
-# print(g)
-# print(g.bonne_colonne(3))
-# print("bonne colonne")
-
-# print(g)
-# g.bonne_ligne(6)
-# print("bonne ligne")
-
-# print(g)
-# print("----heuristique2 avec grille non modifiée ")
-# print(g.heuristique2())
-
-
-
-# print(g.grid_to_graph())
-from graph import Graph
-# G=Graph([1,2])
-# print(G)
-#G2= Graph.graph_from_file("../input/graph1.in")
-
-#g.swap_seq([((0,0),(1,0)),((1,2),(1,1)),((1,1),(1,0))])
-
-# print("---heuristique1")
-# print(g.heuristique())
-
-# print("----heuristique2 avec grille modifiée ")
-
-# print(g.heuristique2())
-
-#g.swap_seq([((0,0),(1,0))])
-
-#print(g)
-#print(g.state[0])
-
-#A=g.grid_to_graph2()
-
-#print(A)
-#print(A.a_star(g.hashage2(),global_haschage2([[1,2,3],[4,5,6]])))
-
-
-# #les lignes suivantes permettent d'afficher correctement le chemin de résolution à l'aide de bfs pour la question 7 
-# #------------
-# B=[a for a in A.bfs2(g.hashage2(),global_haschage2([[1,2,3],[4,5,6]]))]
-# print("BBBBB")
-# print(B)
-# for i in range(len(B)):
-#     B[i]= get_grid_from_hashfinal(B[i])
-# print(B)
-# #------------
-
-
-#print(A.bfs2(g.hashage(),123456))
-# print(g)
-# print(G2)
-# print("caca")
-#print(G2.bfs2(1,6))
-# print(G2.bfs(1,6))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# #print(g.is_sorted())
-# data_path = "../input/"
-# file_name = data_path + "grid0.in"
-
-# print(file_name)
-
-# g = Grid.grid_from_file(file_name)
-# print(g) 

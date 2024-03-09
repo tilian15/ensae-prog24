@@ -1,79 +1,39 @@
-import pygame
-import sys
-import os
 import random
+import os
+import pygame
+import pygame_gui
+from collections import deque
+
+from pygame_gui import UIManager, PackageResource
+
+from pygame_gui.elements import UIWindow
+from pygame_gui.elements import UIButton
+from pygame_gui.elements import UIHorizontalSlider
+from pygame_gui.elements import UITextEntryLine
+from pygame_gui.elements import UIDropDownMenu
+from pygame_gui.elements import UIScreenSpaceHealthBar
+from pygame_gui.elements import UILabel
+from pygame_gui.elements import UIImage
+from pygame_gui.elements import UIPanel
+from pygame_gui.elements import UISelectionList
+from pygame_gui.elements import UITextBox
+from pygame_gui.windows import UIMessageWindow
+
 import grid as gridLib
 from solver import Solver
-from PIL import Image
-import re
 
-# Définition des couleurs
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-BLUE = (100, 200, 250)
-DARK_BLUE = (40, 50, 130)
-GREEN = (0, 255, 0)
-ARIAL = os.path.join(os.environ["SystemRoot"], "Fonts", "arial.ttf")
+import pygame
 
-
-class CaseNum:
-    def __init__(self, image_path, grid, nb_row, nb_column, tile_size):
-        self.image_path = image_path
-        self.nb_row = nb_row
-        self.nb_column = nb_column
-        self.tile_size = tile_size
-
-        # self.tiles = self.split_image(image_path)
-        self.grid = grid.state
+TILE_SIZE = 50
+POSITION = (50, 500)
+FIRST_TILE_POSITION = None
         
-
-    # def split_image(self, image_path):
-    #     image = Image.open(image_path)
-    #     width, height = image.size
-    #     tile_width = width // self.nb_column
-    #     tile_height = height // self.nb_row
-
-    #     tiles = []
-    #     for y in range(self.nb_row):
-    #         for x in range(self.nb_column):
-    #             box = (x * tile_width, y * tile_height, (x + 1) * tile_width, (y + 1) * tile_height)
-    #             tile = image.crop(box)
-    #             tiles.append(tile)
-    #     return tiles
-
-
-    def draw_grid(self, screen, position):
-        for row in range(self.nb_row):
-            for column in range(self.nb_column):
-                # tile_rect = pygame.Rect(column * self.tile_size + position[0], row * self.tile_size + position[1], self.tile_size, self.tile_size)
-                # pygame.draw.rect(screen, BLACK, tile_rect, 1)  # Dessiner une bordure noire autour de la tuile
-                pygame.draw.rect(screen, DARK_BLUE, (column * self.tile_size + position[0], row * self.tile_size + position[1], self.tile_size, self.tile_size), 1)
-
-                # index = self.grid[row][column]
-                # if 0 <= index < len(self.tiles):  # Vérifier si l'indice est valide
-                #     image = pygame.image.frombuffer(self.tiles[index].tobytes(), self.tiles[index].size, self.tiles[index].mode)
-                #     image = pygame.transform.scale(image, (self.tile_size, self.tile_size))
-
-                #     # Calculer la position d'affichage de l'image en fonction de la position globale de la grille
-                #     display_position = (column * self.tile_size + position[0], row * self.tile_size + position[1])
-                #     screen.blit(image, display_position)
-
-                font = pygame.font.Font(None, 20)
-                number_text = font.render(str(self.grid[row][column]), True, DARK_BLUE)
-                text_rect = number_text.get_rect(center=(column * self.tile_size + self.tile_size // 2 + position[0], row * self.tile_size + self.tile_size // 2 + position[1]))
-                screen.blit(number_text, text_rect)
-
-    def handle_click(self, first_tile_position, second_tile_position):
-        row1, col1 = first_tile_position
-        row2, col2 = second_tile_position
-        self.grid[row1][col1], self.grid[row2][col2] = self.grid[row2][col2], self.grid[row1][col1]
-
 class SwapGenerator:
-    def generate_swaps(self, num_swaps, nb_row, nb_column):
+    def generate_swaps(self, num_swaps, nb_lignes, nb_col): #nous permet de generer les swaps à réaliser pour rendre une grille aléatoire 
         swaps = []
         for _ in range(num_swaps):
-            row = random.randint(0, nb_row - 2)
-            col = random.randint(0, nb_column - 2)  # Limite de la colonne pour permettre les échanges adjacents
+            row = random.randint(0, nb_lignes - 2)
+            col = random.randint(0, nb_col - 2)  # Limite de la colonne pour permettre les échanges adjacents
             direction = random.choice(['horizontal', 'vertical'])  # Choisir aléatoirement la direction de l'échange
             if direction == 'horizontal':
                 swap1 = (row, col)
@@ -83,177 +43,341 @@ class SwapGenerator:
                 swap2 = (row + 1, col)
             swaps.append((swap1, swap2))
         return swaps
-
-def restart_game(gOriginal, grid_naive, grid_bfs2, grid_a_star, swaps, nb_swaps, nb_row, nb_column):
-    print("RESTARTTTTT")
-    swap_generator = SwapGenerator()
-    swaps = swap_generator.generate_swaps(nb_swaps, nb_row, nb_column)
-    gOriginal.swap_seq(swaps)
-    grid_naive.swap_seq(swaps)
-    grid_bfs2.swap_seq(swaps)
-    grid_a_star.swap_seq(swaps)
-
-    solver = Solver(grid_naive)
-    a_naive = solver.get_solution_naive()
-
-    solver = Solver(grid_bfs2)
-    a_bfs2 = solver.bfs2()
-
-    return swaps  # Retourner les swaps générés
-
-def main(image_path):
-    NB_ROW = 3
-    NB_COLUMN = 4
-    nb_row = NB_ROW
-    nb_column = NB_COLUMN
-    nb_swaps = 3
-    display_grid_result = False
     
-    SCREEN_WIDTH = 1200
-    SCREEN_HEIGHT = 800
+class CaseNum:
+    def __init__(self, grid, nb_lignes, nb_col, tile_size, puzzleWin, ui_manager):
+        self.nb_lignes = nb_lignes
+        self.nb_col = nb_col
+        self.tile_size = tile_size
+        self.grid = grid.state
+        self.puzzleWin = puzzleWin
+        self.ui_manager = ui_manager
+        
+    def draw_grid(self, position):                             
+        for row in range(self.nb_lignes):
+            for column in range(self.nb_col):
+                # pygame.draw.rect(screen, (204, 204, 204), (column * self.tile_size + position[0], row * self.tile_size + position[1], self.tile_size, self.tile_size), 1)
+                # font = pygame.font.Font(None, 20)
+                # number_text = font.render(str(self.grid[row][column]), True, (204, 204, 204))
+                # text_rect = number_text.get_rect(center=(column * self.tile_size + self.tile_size // 2 + position[0], row * self.tile_size + self.tile_size // 2 + position[1]))
+                # screen.blit(number_text, text_rect)
+                button = UIButton(
+                    pygame.Rect(column * self.tile_size + position[0],row * self.tile_size + position[1],self.tile_size,self.tile_size),
+                    str(self.grid[row][column]),
+                    self.ui_manager,container=self.puzzleWin,object_id='#disable_button',  
+                )
+                button.set_relative_position(
+                    (column * self.tile_size + self.tile_size // 2 + position[0], 
+                     row * self.tile_size + self.tile_size // 2 + position[1])
+                )
+               
 
-    TILE_SIZE = 50
+    def handle_click(self, first_tile_position, second_tile_position):
+        row1, col1 = first_tile_position
+        row2, col2 = second_tile_position
+        self.grid[row1][col1], self.grid[row2][col2] = self.grid[row2][col2], self.grid[row1][col1]
 
-    swap_generator = SwapGenerator()
-    swaps = swap_generator.generate_swaps(nb_swaps, nb_row, nb_column)
+class PuzzleWindow(UIWindow):
+    def __init__(self, rect, ui_manager, nb_lignes, nb_col, nb_swaps):
+        super().__init__(rect, ui_manager,
+                         window_display_title='SWAP PUZZLE : Comparaison d\'algorithmes',
+                         object_id='#everything_window',
+                         resizable=True,
+                         element_id='puzzle')
 
-    gOriginal = gridLib.Grid(nb_row, nb_column)
-    gOriginal.swap_seq(swaps)
+        self.nb_lignes = nb_lignes
+        self.nb_col = nb_col
+        self.nb_swaps = nb_swaps
 
-    grid_naive = gOriginal.clone()
-    grid_bfs2 = gOriginal.clone()
-    grid_a_star = gOriginal.clone()
+        self.options = Options()
+        self.titre = UILabel(pygame.Rect(self.options.resolution[0] /2,20,750,44),"Comparaison d'algorithmes",self.ui_manager,object_id='#titre',container=self)
+        label_position = pygame.math.Vector2((self.options.resolution[0] - self.titre.rect.width) // 2, 20) # centre en largeur
+        self.titre.set_relative_position(label_position)
 
-    # Initialisation de Pygame
-    pygame.init()
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption(f"Jeu des cases numérotées {nb_row}x{nb_column}")
+        swap_generator = SwapGenerator()
+        swaps = swap_generator.generate_swaps(self.nb_swaps, self.nb_lignes, self.nb_col)
+        text_swaps = ''
+        for grid in swaps:
+            text_swaps += str(grid) + '<br>'
 
-    # Initialiser la classe CaseNum avec le chemin de l'image
-    image_path = "C:\\Users\\celin\\OneDrive\\Bureau\\python\\nice.jpg"
-    case_num = CaseNum(image_path, gOriginal, nb_row, nb_column, TILE_SIZE)
+        UITextBox(f'<b>Nombre de colonnes :</b> {self.nb_col}'
+                    '<br>'
+                    f'<b>Nombre de lignes :</b> {self.nb_lignes}'
+                    '<br>'
+                    f'<b>Nombre de swaps :</b> {self.nb_swaps}'
+                    '<br>'
+                    f'Swaps : <br>{text_swaps}'
+                    '<br>'
+                    '',
+                    pygame.Rect((50, int(self.options.resolution[1] * 0.15)), (250, 300)),self.ui_manager,object_id='text_box',
+                                            container=self)
+        
+        gOriginal = gridLib.Grid(self.nb_lignes, self.nb_col)
+        gOriginal.swap_seq(swaps)
 
-    solver = Solver(grid_naive)
-    a_naive = solver.get_solution_naive()
-    Solver.display(a_naive, display_grid_result)
+        case_num = CaseNum(gOriginal, self.nb_lignes, self.nb_col, TILE_SIZE, self, self.ui_manager)
+        case_num.draw_grid(POSITION)
 
-    solver = Solver(grid_bfs2)
-    a_bfs2 = solver.bfs2()
-    Solver.display(a_bfs2, display_grid_result)
+        result = self.start_algo(gOriginal)
+        self.display_results(result)
 
-    solver = Solver(grid_a_star)
-    a_star = solver.a_star()
-    Solver.display(a_star, display_grid_result)
+        
+    def display_results(self, result):
+        a_naive = result[0]
+        a_bfs2 = result[1]
+        a_star = result[2]
 
-    image_path = "C:\\Users\\celin\\OneDrive\\Bureau\\python\\nice.jpg"
-    case_num = CaseNum(image_path, gOriginal, nb_row, nb_column, TILE_SIZE)
+        text_a_naive = ''
+        for grid in a_naive[2]:
+            text_a_naive += str(grid.state) + '<br>'
+        
+        text_a_bfs2 = ''
+        for grid in a_bfs2[2]:
+            text_a_bfs2 += str(grid.state) + '<br>'
 
-    #    gridTarget = gridLib.Grid(nb_row,nb_column) 
+        text_a_star = ''
+        for grid in a_star[2]:
+            text_a_star += str(grid.state) + '<br>'
 
-    # Variables pour le clic de souris
-    first_tile_position = None
-    position = (50, 50)
+        UITextBox('<b> Méthode naïve :</b>'
+            f'<i>{a_naive[1]} swaps en {a_naive[0]}s</i>'
+            '<br>'
+            f'{text_a_naive}'
+            '<br>'
+            '<b> Méthode BSF2 :</b>'
+            f'<i>{a_bfs2[1]} swaps en {a_bfs2[0]}s</i>'
+            '<br>'
+            f'{text_a_bfs2}'
+            '<br>'
+            '<b> Méthode A* :</b>'
+            f'<i>{a_star[1]} swaps en {a_star[0]}s</i>'
+            '<br>'
+            f'{text_a_star}'
+            '<br>'
+            '<br>'
+            '',
+            pygame.Rect((self.options.resolution[0] /2-50, int(self.options.resolution[1] * 0.15)), 
+                        (self.options.resolution[0] /2-50, self.options.resolution[1]-100)),
+                        self.ui_manager,object_id='#text_box_trans',
+                        container=self)
 
-    # Boucle principale du jeu
-    while True:
+    def start_algo(self, gOriginal):
+        grid_naive = gOriginal.clone()
+        grid_bfs2 = gOriginal.clone()
+        grid_a_star = gOriginal.clone()
+
+        display_grid_result = False
+        solver = Solver(grid_naive)
+        a_naive = solver.get_solution_naive()
+        print("Naive")
+        Solver.display(a_naive, display_grid_result)
+
+
+        solver = Solver(grid_a_star)
+        a_star = solver.a_star()
+        print("A*")
+        Solver.display(a_star, display_grid_result)
+
+        solver = Solver(grid_bfs2)
+        a_bfs2 = solver.bfs2_optimise()
+        print("BF2")
+        Solver.display(a_bfs2, display_grid_result)
+
+        result = []
+        result.append(a_naive)
+        # result.append(a_naive)
+        # result.append(a_naive)
+        
+        result.append(a_bfs2)
+        result.append(a_star)
+
+        return result
+        
+    def update(self, time_delta):
+        super().update(time_delta)
+
+
+class Options:
+    def __init__(self):
+        self.resolution = (800, 800)
+        self.fullscreen = False
+
+class OptionsUIApp:
+    def __init__(self):
+        pygame.init()
+        pygame.display.set_caption("SWAP PUZZLE : Configuration")
+        self.options = Options()
+        if self.options.fullscreen:
+            self.window_surface = pygame.display.set_mode(self.options.resolution,
+                                                          pygame.FULLSCREEN)
+        else:
+            self.window_surface = pygame.display.set_mode(self.options.resolution)
+
+        self.background_surface = None
+
+        self.ui_manager = UIManager(self.options.resolution,
+                                    PackageResource(package='data.themes',
+                                                    resource='theme_2.json'))
+        self.ui_manager.preload_fonts([{'name': 'fira_code', 'point_size': 10, 'style': 'bold'},
+                                       {'name': 'fira_code', 'point_size': 10, 'style': 'regular'},
+                                       {'name': 'fira_code', 'point_size': 10, 'style': 'italic'},
+                                       {'name': 'fira_code', 'point_size': 14, 'style': 'italic'},
+                                       {'name': 'fira_code', 'point_size': 14, 'style': 'bold'}
+                                       ])
+
+        self.test_button_go = None
+        self.test_text_down_nb_ligne = None
+        self.test_drop_down_nb_ligne= None
+        self.test_text_down_nb_colonne= None
+        self.test_drop_down_nb_colonne= None
+        self.panel = None
+        self.titre = None
+        self.swap_selection = None
+
+        self.message_window = None
+
+        self.recreate_ui()
+
+        self.clock = pygame.time.Clock()
+        self.time_delta_stack = deque([])
+
+        self.button_response_timer = pygame.time.Clock()
+        self.running = True
+        self.debug_mode = False
+
+        self.all_enabled = True
+        self.all_shown = True
+
+    def recreate_ui(self):
+        self.ui_manager.set_window_resolution(self.options.resolution)
+        self.ui_manager.clear_and_reset()
+
+        self.background_surface = pygame.Surface(self.options.resolution)
+        self.background_surface.fill(self.ui_manager.get_theme().get_colour('dark_bg'))
+
+        self.test_button_go = UIButton(pygame.Rect((int(self.options.resolution[0] / 2),int(self.options.resolution[1] * 0.50)),(110, 40)),
+                                      'GO',
+                                      self.ui_manager,
+                                      object_id='#disable_button')
+
+        self.test_text_down_nb_colonne = UILabel(pygame.Rect(self.options.resolution[0] /2-100,int(self.options.resolution[1] * 0.25),200,27),
+                                                 "Nombre de colonnes",
+                                                 self.ui_manager,
+                                                 object_id='#label')
+                    
+        self.test_text_down_nb_ligne = UILabel(pygame.Rect(self.options.resolution[0] /2-100,int(self.options.resolution[1] * 0.3),200,27),
+                                                "Nombre de lignes",
+                                                self.ui_manager,
+                                                object_id='#label')
+                                        
+        self.test_drop_down_nb_ligne= UIDropDownMenu([ '2', '3', '4', '5'],'3',
+                                             pygame.Rect((int(self.options.resolution[0] / 2+100),int(self.options.resolution[1] * 0.3)),(200, 25)),
+                                             self.ui_manager)
+        
+        self.test_drop_down_nb_colonne = UIDropDownMenu(['2', '3', '4', '5'],'3',
+                                                        pygame.Rect((int(self.options.resolution[0] / 2+100),int(self.options.resolution[1] * 0.25)),(200, 25)),
+                                                        self.ui_manager)
+
+        self.panel = UIPanel(pygame.Rect(50, 120, 200, 270),
+                             starting_height=4,
+                             manager=self.ui_manager)
+
+        UIButton(pygame.Rect(10, 10, 174, 30), 'Nombre de swaps',
+                 manager=self.ui_manager,
+                 container=self.panel)
+
+        self.swap_selection = UISelectionList(pygame.Rect(10, 50, 174, 200),
+                                              item_list=['1','2','3','4','5','6','7','8','9','10',
+                                                         '11','12','13','14','15','16','17','18','19','20'],
+                                                         manager=self.ui_manager,
+                                                         container=self.panel,
+                                                         allow_multi_select=False, 
+                                                         default_selection='5' )
+
+        self.titre = UILabel(pygame.Rect(self.options.resolution[0] /2,20,230,44),"SWAP PUZZLE",self.ui_manager,object_id='#titre')
+
+        # Centrer le UILabel dans la fenêtre
+        self.options = Options() 
+        label_position = pygame.math.Vector2((self.options.resolution[0] - self.titre.rect.width) // 2, 20) # centre en largeur
+        self.titre.set_relative_position(label_position)
+
+    def change_ligne_colonne(self):
+        print(f"NB Colonne : {self.test_drop_down_nb_colonne.selected_option}")
+        print(f"NB Lignes : {self.test_drop_down_nb_ligne.selected_option}")
+        selected_index = self.swap_selection.get_single_selection()
+        if selected_index is not None:
+            selected_value = self.swap_selection.item_list[int(selected_index)]
+            print(f"NB Swaps : {int(selected_value['text'])-1 }")
+
+    def process_events(self):
+        global FIRST_TILE_POSITION
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                self.running = False
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_x, mouse_y = pygame.mouse.get_pos()
-                column = (mouse_x - position[0]) // TILE_SIZE
-                row = (mouse_y - position[1]) // TILE_SIZE
-                if 0 <= row < nb_row and 0 <= column < nb_column:  # Vérifier les limites
-                    if first_tile_position is not None:
-                        # Vérifier si la position actuelle est adjacente à la première position cliquée
-                        if (abs(row - first_tile_position[0]) == 1 and column == first_tile_position[1]) or \
-                                (row == first_tile_position[0] and abs(column - first_tile_position[1]) == 1):
-                            # Effectuer l'échange de cases ici
-                            case_num.handle_click(first_tile_position, (row, column))
-                            first_tile_position = None  # Réinitialiser la position du premier tile
-                    else:
-                        first_tile_position = (row, column)  # Stocker la position du premier tile
+            self.ui_manager.process_events(event)
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if 400 <= mouse_x <= 500 and 350 <= mouse_y <= 400:
-                    swaps = restart_game(gOriginal, grid_naive, grid_bfs2, grid_a_star, swaps, nb_swaps, nb_row, nb_column)
-                    case_num = CaseNum(image_path, gOriginal, nb_row, nb_column, TILE_SIZE)  # Mettre à jour la grille
+            if event.type == pygame_gui.UI_BUTTON_PRESSED:
+                if event.ui_element == self.test_button_go:
+    
+                    selected_index = self.swap_selection.get_single_selection()
+                    if selected_index is not None:
+                        selected_value = self.swap_selection.item_list[int(selected_index)]
+                        nb_swaps = int(selected_value['text'])-1
 
+                    nb_lignes = int(self.test_drop_down_nb_ligne.selected_option)
+                    nb_col = int(self.test_drop_down_nb_colonne.selected_option)
+                    PuzzleWindow(pygame.Rect((5, 5), (800, 800)), self.ui_manager, nb_lignes, nb_col, nb_swaps)
 
-        screen.fill(BLUE)
-        case_num.draw_grid(screen, position)
-        if first_tile_position is not None:
-            pygame.draw.rect(screen, GREEN, (first_tile_position[1] * TILE_SIZE + position[0],
-                                             first_tile_position[0] * TILE_SIZE + position[1], TILE_SIZE, TILE_SIZE))
-            font = pygame.font.Font(None, 20)
-            white_number_text = font.render(str(case_num.grid[first_tile_position[0]][first_tile_position[1]]), True, WHITE)
-            text_rect = white_number_text.get_rect(center=(first_tile_position[1] * TILE_SIZE + TILE_SIZE // 2 + position[0],
-                                                           first_tile_position[0] * TILE_SIZE + TILE_SIZE // 2 + position[1]))
-            screen.blit(white_number_text, text_rect)
+            if (event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED
+                    and (event.ui_element == self.test_drop_down_nb_colonne 
+                         or event.ui_element == self.test_drop_down_nb_ligne)):
+                self.change_ligne_colonne()
 
-        # Affichage de la grille ordonnée en bas à gauche
-        ordered_grid = [[i * nb_column + j + 1 for j in range(nb_column)] for i in range(nb_row)]
-        tile_size_ordered = 50
-        position_ordered = (50, 500)
-        for row in range(nb_row):
-            for column in range(nb_column):
-                pygame.draw.rect(screen, DARK_BLUE, (column * tile_size_ordered + position_ordered[0],
-                                                     row * tile_size_ordered + position_ordered[1], tile_size_ordered,
-                                                     tile_size_ordered), 1)
+            if (event.type == pygame_gui.UI_SELECTION_LIST_NEW_SELECTION
+                and event.ui_element == self.swap_selection):
+                self.change_ligne_colonne()
 
-                font = pygame.font.Font(None, 25)
-                number_text = font.render(str(ordered_grid[row][column]), True, DARK_BLUE)
-                text_rect = number_text.get_rect(center=(column * tile_size_ordered + tile_size_ordered // 2 +
-                                                         position_ordered[0],
-                                                         row * tile_size_ordered + tile_size_ordered // 2 +
-                                                         position_ordered[1]))
-                screen.blit(number_text, text_rect)
-		
+            # if event.type == pygame.MOUSEBUTTONDOWN:
+                # mouse_x, mouse_y = pygame.mouse.get_pos()
+                # column = (mouse_x - POSITION[0]) // TILE_SIZE
+                # row = (mouse_y - POSITION[1]) // TILE_SIZE
+                # nb_col = self.test_drop_down_nb_colonne.selected_option
+                # nb_lignes = self.test_drop_down_nb_ligne.selected_option
+                # if 0 <= row < int(nb_lignes) and 0 <= column < int(nb_col):  # Vérifier les limites
+                #     if FIRST_TILE_POSITION is not None:
+                #         # Vérifier si la position actuelle est adjacente à la première position cliquée
+                #         if (abs(row - FIRST_TILE_POSITION[0]) == 1 and column == FIRST_TILE_POSITION[1]) or \
+                #                 (row == FIRST_TILE_POSITION[0] and abs(column - FIRST_TILE_POSITION[1]) == 1):
+                #             # Effectuer l'échange de cases ici
 
 
-        font = pygame.font.Font(ARIAL, 20)
-        position_column_right = 400
-        x = position_column_right
-        y = 50
+                #             #  A decommenter        case_num.handle_click(first_tile_position, (row, column))
+                #             FIRST_TILE_POSITION = None  # Réinitialiser la position du premier tile
+                #     else:
+                #         print('ICI')
+                #         FIRST_TILE_POSITION = (row, column)  # Stocker la position du premier tile
 
-        text_render = [
-            f"Nombre de swaps : {nb_swaps}",
-            f"Swaps : {swaps}",
-            "",
-            f"Solution naïve : {a_naive[1]} swaps en {a_naive[0]}s",
+    def run(self):
+        while self.running:
+            time_delta = self.clock.tick() / 1000.0
+            self.time_delta_stack.append(time_delta)
+            if len(self.time_delta_stack) > 2000:
+                self.time_delta_stack.popleft()
 
-        ]
+            # check for input
+            self.process_events()
 
-        for grid in a_naive[2]:
-            text_render.append(str(grid.state))
+            # respond to input
+            self.ui_manager.update(time_delta)
 
-        text_render.append("")
-        text_render.append(f"Solution BFS2 : {a_bfs2[1]} swaps en {a_bfs2[0]}s")
-        for grid in a_bfs2[2]:
-            text_render.append(str(grid.state))
+            # draw graphics
+            self.window_surface.blit(self.background_surface, (0, 0))
+            self.ui_manager.draw_ui(self.window_surface)
 
-        text_render.append("")
-        text_render.append(f"Solution A* : {a_star[1]} swaps en {a_star[0]}s")
-        for grid in a_star[2]:
-            text_render.append(str(grid.state))
-        
-        rendered_text = [font.render(line, True, BLACK) for line in text_render]
+            pygame.display.update()
 
-        # Affichage du texte sur la fenêtre
-        for t in rendered_text:
-            screen.blit(t, (x, y))
-            y += t.get_height() + 5  # Espacement entre les lignes
 
-        # pygame.draw.rect(screen, DARK_BLUE, (position_column_right, 350, 100, 50))
-        # restart_font = pygame.font.Font(None, 30)
-        # restart_text = restart_font.render("Restart", True, WHITE)
-        # screen.blit(restart_text, (position_column_right+20, 365))
-
-        pygame.display.flip()
-
-if __name__ == "__main__":
-    image_path = "C:\\Users\\celin\\OneDrive\\Bureau\\python\\nice.jpg"
-
-    main(image_path)
+if __name__ == '__main__':
+    app = OptionsUIApp()
+    app.run()

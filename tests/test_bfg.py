@@ -5,6 +5,8 @@ import unittest
 import grid as gridLib
 import graph as graphLib
 
+import heapq
+
 
 class Test_Swap(unittest.TestCase):
 
@@ -57,6 +59,17 @@ class Test_Swap(unittest.TestCase):
     #     print (result)
 
 
+    def test_hash(self):
+        g1 = gridLib.Grid(2,2)
+        g2 = gridLib.Grid(2,2)
+        self.assertEqual(g1,g2)
+
+        l = []
+        l.append(g1)
+        self.assertEqual(g2 in l, True)
+
+
+
 
     def test_grid4(self):
          grid = gridLib.Grid(2,2)
@@ -69,11 +82,11 @@ class Test_Swap(unittest.TestCase):
          graph=grid.grid_to_graph()
          print(graph)
          print ('Compute BFS:')
-         result = graph.bfs2(grid.hashage(),1234)
+         result = graph.bfs2(grid,1234)
          print ('BFS:')
          print (result)
     def test_checkGraph1In(self):
-        graph = Graph.graph_from_file("./input/graph1.in")
+        graph = graphLib.Graph.graph_from_file("./input/graph1.in")
         # print(graph)
         # print("*********")
         # print(graph.bfs2(1,2))
@@ -93,6 +106,36 @@ class Test_Swap(unittest.TestCase):
             result = graph.bfs2(src,dst)
             result_string = '[' + ', '.join(str (a) for a in result) + ']'
             
+            
+            self.assertEqual(result_string, result_expected)
+            # if (result_string != result_expected) :
+            #     print ('************')
+            #     print(l)
+            
+        solution_file.close()
+
+
+    def test_checkGraph2In(self):
+        graph = graphLib.Graph.graph_from_file("./input/graph2.in")
+
+        # Check 
+        solution_file =  open("./input/graph2.path.out", 'r')
+
+        for l in solution_file.readlines():
+            a = l.split(' ')
+            
+            src = int(a[0])
+            dst = int(a[1])
+            if ('[' not in l):
+                result_expected = 'None'
+            else :
+                result_expected = l[l.index('['):-1]
+            
+            result = graph.bfs2(src,dst)
+            if (result != None):
+                result_string = '[' + ', '.join(str (a) for a in result) + ']'
+            else :
+                result_string = 'None'
             
             self.assertEqual(result_string, result_expected)
             # if (result_string != result_expected) :
