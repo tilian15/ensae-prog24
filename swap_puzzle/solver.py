@@ -123,7 +123,7 @@ class Solver():
         result.append(previous)
         result.reverse()
         return (time.time() - start_time, len(result) -1 , result)
-    # complexité (n+m)*n*m
+    
 
 
     def bfs2_optimise(self): #Question 8, ce bfs ne fonctionnera que pour swap_puzzle 
@@ -138,18 +138,18 @@ class Solver():
         found = False
         if (dst == self.grid):
             found = True           
-        while len(nodes_todo)>0 and not found :             
+        while len(nodes_todo)>0 and not found :  #executer au maximum S fois avec S le nombre de noeuds           
             node_to_analyse = nodes_todo.pop(0) 
-            for n in etat_possible2(node_to_analyse):
+            for n in etat_possible2(node_to_analyse): # chaque noeud u a d(u) voisins, donc au max S-1, or chaque arrete est considérée au plus deux fois donc l'affectation est executée au maximum 2G fois avec G le nombre d'arretes.
                 if n not in nodes_done:
                     if (n not in nodes_todo) :
-                        nodes_todo.append(n)
-                        predecessors[global_haschage2bis(n)] = node_to_analyse
+                        nodes_todo.append(n) 
+                        predecessors[global_haschage2bis(n)] = node_to_analyse 
                     #to exit the while
                     if (n == dst.state):
                         found = True
 
-            nodes_done.append(node_to_analyse)
+            nodes_done.append(node_to_analyse) #réalisé au plus S fois 
         if not found:
             return None 
 
@@ -163,7 +163,7 @@ class Solver():
         result.append(Grid(self.grid.m, self.grid.n,previous))
         result.reverse()
         return (time.time() - start_time, len(result) -1 , result)
-    # complexité (n+m)*n*m
+    # complexité : O(2G + S) + 0(1) * i (toutes les opérations constantes) = O(S + G)
 
     def a_star(self): #ne fonctionnera uniquement pour swap_puzzle
         start_time = time.time()
